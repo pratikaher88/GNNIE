@@ -44,7 +44,7 @@ class ConvModel(nn.Module):
         # TODO : output dimension was dim_dict['out_dim'] (insted of  dim_dict['hidden_dim']) before so I am not sure what to do 
         self.layers.append(
             dglnn.HeteroGraphConv(
-                {etype[1]: ConvLayer((dim_dict['hidden_dim'], dim_dict['hidden_dim']), dim_dict['out_dim'], dim_dict['edge_dim'], dropout,
+                {etype[1]: ConvLayer((dim_dict['hidden_dim'], dim_dict['hidden_dim']), dim_dict['hidden_dim'], dim_dict['edge_dim'], dropout,
                                      aggregator_type, norm)
                  for etype in g.canonical_etypes},
                 aggregate=aggregator_hetero))
