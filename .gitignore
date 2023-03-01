@@ -1,2 +1,4 @@
 .ipynb_checkpoints/
 .DS_Store
+GNN_Architecture/venv/
+GNN_Architecture/__pycache__/
