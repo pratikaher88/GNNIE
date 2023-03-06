@@ -13,7 +13,7 @@ class CosinePrediction(nn.Module):
 
     def forward(self, graph, h):
 
-        print("input graph :", graph)
+        # print("input graph :", graph)
         with graph.local_scope():
             for etype in graph.canonical_etypes:
                 try:
