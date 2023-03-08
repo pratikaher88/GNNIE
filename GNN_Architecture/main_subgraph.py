@@ -1,5 +1,6 @@
-import dgl, torch
+import dgl, torch, pickle
 import numpy as np
+import random
 from model import ConvModel
 from loss import max_margin_loss
 
@@ -10,9 +11,15 @@ ecommerce_hetero_graph = graphs[0]
 
 # subgraph
 
-ecommerce_hetero_graph_subgraph = ecommerce_hetero_graph.subgraph({ 'customer' :list(range(1000)), 'product': list(range(ecommerce_hetero_graph.num_nodes('product')))})
-eids = np.arange(ecommerce_hetero_graph.number_of_edges(etype='orders'))
+# ecommerce_hetero_graph_subgraph = ecommerce_hetero_graph.subgraph({ 'customer' :list(range(1000)), 'product': list(range(ecommerce_hetero_graph.num_nodes('product')))})
 
+ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : list(range(1000)), 'rev-orders' : list(range(1000)) } )
+
+# ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : [random.randint(1, 10000) for i in range(1000)], 'rev-orders' : [random.randint(1, 10000) for i in range(1000)] } )
+
+print(ecommerce_hetero_graph_subgraph)
+
+print(ecommerce_hetero_graph_subgraph.ndata['features']['customer'].shape, ecommerce_hetero_graph_subgraph.ndata['features']['product'].shape)
 
 dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['features'].shape[1],
             'product': ecommerce_hetero_graph_subgraph.nodes['product'].data['features'].shape[1],
@@ -67,6 +74,9 @@ dgl.save_graphs("graph_files/valid_g.dgl", [valid_g])
 dgl.save_graphs("graph_files/test_g.dgl", [test_g])
 dgl.save_graphs("graph_files/ecommerce_hetero_graph_subgraph.dgl", [ecommerce_hetero_graph_subgraph])
 
+with open( 'graph_files/valid_eids_dict.pickle', 'wb') as f:
+    pickle.dump(valid_eids_dict, f, pickle.HIGHEST_PROTOCOL)
+
 # model building
 
 
@@ -110,10 +120,10 @@ for i in range(10):
     
     print(f'Total loss at epoch {i} :',total_loss)
 
-    # # torch.save(model, 'mpnn_model_save.pth')
-    # # torch.save(model.state_dict(), 'graph_files/trained_model.pth')
-    # torch.save({'epoch': i,
-    #         'model_state_dict': model.state_dict(),
-    #         'optimizer_state_dict': optimizer.state_dict(),
-    #         'loss': total_loss}, 
-	#         'graph_files/trained_model.pth')
+    # torch.save(model, 'mpnn_model_save.pth')
+    # torch.save(model.state_dict(), 'graph_files/trained_model.pth')
+    torch.save({'epoch': i,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'loss': total_loss}, 
+	        'graph_files/trained_model.pth')
