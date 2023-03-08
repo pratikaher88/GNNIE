@@ -2,6 +2,9 @@ import dgl, torch
 import numpy as np
 from model import ConvModel
 from loss import max_margin_loss
+import time
+
+start = time.time()
 
 np.random.seed(111)
 
@@ -186,3 +189,4 @@ for i in range(10):
 	        'graph_files/trained_model.pth')
 
 
+print(printtime.time())

@@ -2,6 +2,9 @@ from model import ConvModel
 import dgl, torch, pickle
 from collections import defaultdict
 import numpy as np
+import time
+
+start = time.time()
 
 graphs, _ = dgl.load_graphs("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files/ecommerce_hetero_graph_subgraph.dgl")
 ecommerce_hetero_graph_subgraph = graphs[0]
@@ -176,3 +179,5 @@ print(y['customer'].shape, y['product'].shape)
 # #     print(h[ntype].shape)
 #     y[ntype][output_nodes[ntype]] = h[ntype]    
 #     # print(ip_nodes[ntype].shape)
+
+print(time.time() - start)
