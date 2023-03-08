@@ -4,6 +4,9 @@ import dgl, torch
 from collections import defaultdict
 import numpy as np
 import torch.nn as nn
+import time
+
+print(time.time())
 
 graphs, _ = dgl.load_graphs("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files_full/ecommerce_hetero_graph_subgraph.dgl")
 ecommerce_hetero_graph_subgraph = graphs[0]
@@ -117,9 +120,11 @@ for arg0 , pos_g, neg_g, blocks in valid_dataloader:
     print(count)
     count += 1
 
-    
-    
     # break
+
+import pickle
+with open( 'graph_files_full/trained_embeddings.pickle', 'wb') as f:
+    pickle.dump(y, f, pickle.HIGHEST_PROTOCOL)
 
 
 # print(y['product'])
@@ -172,12 +177,12 @@ for user in range(user_ids):
     
     order = [item for item in order if item not in already_rated]
     
-    rec = order[:10]
+    rec = order[:50]
     recs[user] = rec
 
 print(recs)
 
-def compare_rec(test_g, test_recs, model_recs):
+def compare_rec(valid_recs, model_recs):
   
   total = 0
   correct = 0 
@@ -185,9 +190,9 @@ def compare_rec(test_g, test_recs, model_recs):
   for key, value in model_recs.items():
 
     model_recs_list = model_recs[key]
-    test_recs_list = test_recs[key]
+    test_recs_list = valid_recs[key]
 
-    recommended_movies_correct = list(set(model_recs_list) & set(test_recs_list))
+    recommended_movies_correct = set(list(set(model_recs_list) & set(test_recs_list)))
 
     if len(set(test_recs_list)) > 0:
 
@@ -201,4 +206,6 @@ def compare_rec(test_g, test_recs, model_recs):
   return correct, total
 
 
-print(compare_rec(valid_g, recommendations_from_valid_graph, recs))
+print(compare_rec(recommendations_from_valid_graph, recs))
+
+print(time.time())
