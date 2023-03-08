@@ -81,10 +81,10 @@ test_g = dgl.edge_subgraph(ecommerce_hetero_graph, test_eids_dict, relabel_nodes
 # Fix this
 
 # save down graphs
-dgl.save_graphs("graph_files/train_g.dgl", [train_g])
-dgl.save_graphs("graph_files/valid_g.dgl", [valid_g])
-dgl.save_graphs("graph_files/test_g.dgl", [test_g])
-dgl.save_graphs("graph_files/ecommerce_hetero_graph.dgl", [ecommerce_hetero_graph])
+dgl.save_graphs("graph_files_full/train_g.dgl", [train_g])
+dgl.save_graphs("graph_files_full/valid_g.dgl", [valid_g])
+dgl.save_graphs("graph_files_full/test_g.dgl", [test_g])
+dgl.save_graphs("graph_files_full/ecommerce_hetero_graph.dgl", [ecommerce_hetero_graph])
 
 # dataloader = dgl.dataloading.DataLoader(
 #     train_g, ids_dict, sampler,

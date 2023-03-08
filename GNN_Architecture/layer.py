@@ -21,6 +21,14 @@ class ConvLayer(nn.Module):
 
         self.edge_fc = nn.Linear(edge_dim, self._out_feats*self._out_feats)
         self.edge_dim = edge_dim
+        self.reset_parameters()
+    
+    def reset_parameters(self):
+        gain = nn.init.calculate_gain('relu')
+        nn.init.xavier_uniform_(self.fc_self.weight, gain=gain)
+        nn.init.xavier_uniform_(self.fc_neigh.weight, gain=gain)
+        nn.init.xavier_uniform_(self.fc_preagg.weight, gain=gain)
+        nn.init.xavier_uniform_(self.edge_fc.weight, gain=gain)
 
     def forward(self, graph, x, edge_features):
         

@@ -102,7 +102,7 @@ for arg0 , pos_g, neg_g, blocks in valid_dataloader:
     for ntype in h.keys():
         y[ntype][output_nodes[ntype]] = h[ntype]
 
-print(y['customer'].shape, y['product'].shape)
+print(y['customer'][0], y['customer'].shape, y['product'].shape)
 
 
 user_ids = valid_g.num_nodes('customer')
@@ -129,7 +129,7 @@ for user in range(user_ids):
     rec = order[:100]
     recs[user] = rec
 
-print(recs)
+# print(recs)
 
 
 
@@ -157,4 +157,4 @@ def compare_rec(test_g, test_recs, model_recs):
   return correct, total
 
 
-print(compare_rec(valid_g, recommendations_from_valid_graph, recs))
+# print(compare_rec(valid_g, recommendations_from_valid_graph, recs))

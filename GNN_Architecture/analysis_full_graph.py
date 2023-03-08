@@ -117,11 +117,16 @@ for arg0 , pos_g, neg_g, blocks in valid_dataloader:
     for ntype in h.keys():
         y[ntype][output_nodes[ntype]] = h[ntype]
 
+        print(h[ntype][0])
+        # break
+    
+    break
     print(count)
     count += 1
 
     # break
 
+exit()
 import pickle
 with open( 'graph_files_full/trained_embeddings.pickle', 'wb') as f:
     pickle.dump(y, f, pickle.HIGHEST_PROTOCOL)
