@@ -41,10 +41,10 @@ class ConvModel(nn.Module):
         
         # output layer
 
-        # TODO : output dimension was dim_dict['out_dim'] (insted of  dim_dict['hidden_dim']) before so I am not sure what to do 
+        # TODO : output dimension was dim_dict['out_dim'] (instead of  dim_dict['hidden_dim']) before so I am not sure what to do 
         self.layers.append(
             dglnn.HeteroGraphConv(
-                {etype[1]: ConvLayer((dim_dict['hidden_dim'], dim_dict['hidden_dim']), dim_dict['hidden_dim'], dim_dict['edge_dim'], dropout,
+                {etype[1]: ConvLayer((dim_dict['hidden_dim'], dim_dict['hidden_dim']), dim_dict['out_dim'], dim_dict['edge_dim'], dropout,
                                      aggregator_type, norm)
                  for etype in g.canonical_etypes},
                 aggregate=aggregator_hetero))
@@ -60,13 +60,18 @@ class ConvModel(nn.Module):
         
         for i in range(len(blocks)):
             layer = self.layers[i]
-            print(f"layer {i} of {len(self.layers)}")
+            # print(f"layer {i} of {len(self.layers)}")
 
             edge_features = blocks[i].edata['features']
 
+            # print(edge_features[('customer', 'orders', 'product')].shape, edge_features[('product', 'rev-orders', 'customer')].shape)
+
+            # print(blocks[i])
             HM = {}
             for key, value in edge_features.items():
                 HM[key[1]] = (value, )
+
+            # print(HM['orders'][0].shape, HM['rev-orders'][0].shape)
 
             h = layer(blocks[i], h, mod_args = HM)
 
@@ -88,12 +93,11 @@ class ConvModel(nn.Module):
 
             h = self.get_repr(blocks, h, edge_features)
 
-            # print("H-value", h['customer'].shape, h['product'].shape)
+            print("H-value", h['customer'].shape, h['product'].shape)
 
             # print("graphs", pos_g, neg_g)
 
-            # pos_score = self.pred_fn(pos_g, h)
+            pos_score = self.pred_fn(pos_g, h)
+            neg_score = self.pred_fn(neg_g, h)
 
-            # neg_score = self.pred_fn(neg_g, h)
-
-            # return h, pos_score, neg_score
+            return h, pos_score, neg_score
