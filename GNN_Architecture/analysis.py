@@ -3,19 +3,20 @@ import dgl, torch, pickle
 from collections import defaultdict
 import numpy as np
 import time
+from settings import BASE_DIR
 
 start = time.time()
 
-graphs, _ = dgl.load_graphs("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files/ecommerce_hetero_graph_subgraph.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/ecommerce_hetero_graph_subgraph.dgl")
 ecommerce_hetero_graph_subgraph = graphs[0]
 
-graphs, _ = dgl.load_graphs("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files/train_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/train_g.dgl")
 train_g = graphs[0]
 
-graphs, _ = dgl.load_graphs("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files/test_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/test_g.dgl")
 test_g = graphs[0]
 
-graphs, _ = dgl.load_graphs("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files/valid_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/valid_g.dgl")
 valid_g = graphs[0]
 
 dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['features'].shape[1],
@@ -25,7 +26,7 @@ dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['
             'out_dim': 64
            }
 
-saved_model = torch.load('/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files/trained_model.pth')
+saved_model = torch.load(f"{BASE_DIR}/graph_files/trained_model.pth")
 
 mpnn_model = ConvModel(ecommerce_hetero_graph_subgraph, 3, dim_dict)
 mpnn_model.load_state_dict(saved_model['model_state_dict'])
@@ -96,7 +97,7 @@ for e in valid_g.etypes:
 
 # print(valid_eids_dict)
 
-# f = open('graph_files/valid_eids_dict.pickle', 'rb')
+# f = open('f"{BASE_DIR}/graph_files/valid_eids_dict.pickle', 'rb')
 # valid_eids_dict = pickle.load(f)
 
 # nodeloader_test = dgl.dataloading.DataLoader(

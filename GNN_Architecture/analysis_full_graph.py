@@ -5,22 +5,24 @@ from collections import defaultdict
 import numpy as np
 import torch.nn as nn
 import time
+from settings import BASE_DIR
 
 print(time.time())
 
-graphs, _ = dgl.load_graphs("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files_full/ecommerce_hetero_graph_subgraph.dgl")
+
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_full/ecommerce_hetero_graph_subgraph.dgl")
 ecommerce_hetero_graph_subgraph = graphs[0]
 
-graphs, _ = dgl.load_graphs("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files_full/ecommerce_hetero_graph.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}graph_files_full/ecommerce_hetero_graph.dgl")
 ecommerce_hetero_graph = graphs[0]
 
-graphs, _ = dgl.load_graphs("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files_full/train_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_full/train_g.dgl")
 train_g = graphs[0]
 
-graphs, _ = dgl.load_graphs("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files_full/test_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_full/test_g.dgl")
 test_g = graphs[0]
 
-graphs, _ = dgl.load_graphs("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files_full/valid_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_full/valid_g.dgl")
 valid_g = graphs[0]
 
 dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['features'].shape[1],
@@ -30,7 +32,7 @@ dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['
             'out_dim': 64
            }
 
-saved_model = torch.load('/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files_full/trained_model.pth')
+saved_model = torch.load(f'{BASE_DIR}/graph_files_full/trained_model.pth')
 
 mpnn_model = ConvModel(ecommerce_hetero_graph_subgraph, 3, dim_dict)
 mpnn_model.load_state_dict(saved_model['model_state_dict'])
@@ -126,9 +128,8 @@ for arg0 , pos_g, neg_g, blocks in valid_dataloader:
     # break
 
 import pickle
-with open( 'graph_files_full/trained_embeddings.pickle', 'wb') as f:
+with open( f'{BASE_DIR}/graph_files_full/trained_embeddings.pickle', 'wb') as f:
     pickle.dump(y, f, pickle.HIGHEST_PROTOCOL)
-
 
 # print(y['product'])
 ## check what they do on valid graph
@@ -175,7 +176,7 @@ for user in range(user_ids):
     cos = nn.CosineSimilarity(dim=1, eps=1e-6)
     ratings = cos(user_emb_rpt, y['product'])
     
-    ratings_formatted = ratings.detach().numpy().reshape(test_g.num_nodes('product'),)
+    ratings_formatted = ratings.detach().numpy().reshape(valid_g.num_nodes('product'),)
     order = np.argsort(-ratings_formatted)
     
     order = [item for item in order if item not in already_rated]

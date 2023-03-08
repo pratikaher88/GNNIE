@@ -1,7 +1,12 @@
 import torch, dgl, numpy as np
+from settings import BASE_DIR
 
-graphs, _ = dgl.load_graphs("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files/ecommerce_hetero_graph_subgraph.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_next_run/ecommerce_hetero_graph.dgl")
 g = graphs[0]
+
+print(g.in_degrees(etype='orders').sort())
+
+exit(g.out_degrees(etype='orders').sort())
 
 # g = dgl.rand_graph(300, 300)
 

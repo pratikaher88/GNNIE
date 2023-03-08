@@ -4,17 +4,18 @@ import torch.nn as nn
 
 from collections import defaultdict
 import numpy as np
+from settings import BASE_DIR
 
-graphs, _ = dgl.load_graphs("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files/ecommerce_hetero_graph_subgraph.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/ecommerce_hetero_graph_subgraph.dgl")
 ecommerce_hetero_graph_subgraph = graphs[0]
 
-graphs, _ = dgl.load_graphs("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files/train_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/train_g.dgl")
 train_g = graphs[0]
 
-graphs, _ = dgl.load_graphs("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files/test_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/test_g.dgl")
 test_g = graphs[0]
 
-graphs, _ = dgl.load_graphs("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files/valid_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/valid_g.dgl")
 valid_g = graphs[0]
 
 dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['features'].shape[1],
@@ -24,7 +25,7 @@ dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['
             'out_dim': 64
            }
 
-saved_model = torch.load('/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/graph_files/trained_model.pth')
+saved_model = torch.load(f"{BASE_DIR}/graph_files/trained_model.pth")
 
 mpnn_model = ConvModel(ecommerce_hetero_graph_subgraph, 3, dim_dict)
 mpnn_model.load_state_dict(saved_model['model_state_dict'])
@@ -121,19 +122,18 @@ for user in range(user_ids):
     cos = nn.CosineSimilarity(dim=1, eps=1e-6)
     ratings = cos(user_emb_rpt, y['product'])
     
-    ratings_formatted = ratings.detach().numpy().reshape(test_g.num_nodes('product'),)
+    ratings_formatted = ratings.detach().numpy().reshape(valid_g.num_nodes('product'),)
     order = np.argsort(-ratings_formatted)
     
     order = [item for item in order if item not in already_rated]
     
-    rec = order[:100]
+    rec = order[:50]
     recs[user] = rec
 
 # print(recs)
 
 
-
-def compare_rec(test_g, test_recs, model_recs):
+def compare_rec(test_recs, model_recs):
   
   total = 0
   correct = 0 
@@ -147,8 +147,8 @@ def compare_rec(test_g, test_recs, model_recs):
 
     if len(set(test_recs_list)) > 0:
 
-        print("User ID", key, "Correctly predicted movies", recommended_movies_correct)
-        print("Total test values", len(recommended_movies_correct), "out of", len(set(test_recs_list)))
+        # print("User ID", key, "Correctly predicted movies", recommended_movies_correct)
+        # print("Total test values", len(recommended_movies_correct), "out of", len(set(test_recs_list)))
         
         correct += len(recommended_movies_correct)
         total += len(set(test_recs_list))
@@ -157,4 +157,4 @@ def compare_rec(test_g, test_recs, model_recs):
   return correct, total
 
 
-# print(compare_rec(valid_g, recommendations_from_valid_graph, recs))
+print(compare_rec(recommendations_from_valid_graph, recs))

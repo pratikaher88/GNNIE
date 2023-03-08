@@ -3,10 +3,11 @@ import numpy as np
 import random
 from model import ConvModel
 from loss import max_margin_loss
+from settings import BASE_DIR
 
 np.random.seed(111)
 
-graphs, _ = dgl.load_graphs("graph_files/ecommerce_hetero_graph.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/ecommerce_hetero_graph.dgl")
 ecommerce_hetero_graph = graphs[0]
 
 # subgraph
@@ -69,12 +70,12 @@ print("Number of batches ",len(dataloader))
 # save down graphs
 
 # save down graphs
-dgl.save_graphs("graph_files/train_g.dgl", [train_g])
-dgl.save_graphs("graph_files/valid_g.dgl", [valid_g])
-dgl.save_graphs("graph_files/test_g.dgl", [test_g])
-dgl.save_graphs("graph_files/ecommerce_hetero_graph_subgraph.dgl", [ecommerce_hetero_graph_subgraph])
+dgl.save_graphs(f"{BASE_DIR}/graph_files/train_g.dgl", [train_g])
+dgl.save_graphs(f"{BASE_DIR}/graph_files/valid_g.dgl", [valid_g])
+dgl.save_graphs(f"{BASE_DIR}/graph_files/test_g.dgl", [test_g])
+dgl.save_graphs(f"{BASE_DIR}/graph_files/ecommerce_hetero_graph_subgraph.dgl", [ecommerce_hetero_graph_subgraph])
 
-with open( 'graph_files/valid_eids_dict.pickle', 'wb') as f:
+with open( f'{BASE_DIR}/f"{BASE_DIR}/graph_files/valid_eids_dict.pickle', 'wb') as f:
     pickle.dump(valid_eids_dict, f, pickle.HIGHEST_PROTOCOL)
 
 # model building
@@ -121,9 +122,9 @@ for i in range(10):
     print(f'Total loss at epoch {i} :',total_loss)
 
     # torch.save(model, 'mpnn_model_save.pth')
-    # torch.save(model.state_dict(), 'graph_files/trained_model.pth')
+    # torch.save(model.state_dict(), 'f"{BASE_DIR}/graph_files/trained_model.pth')
     torch.save({'epoch': i,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': total_loss}, 
-	        'graph_files/trained_model.pth')
+	        f'{BASE_DIR}f"{BASE_DIR}/graph_files/trained_model.pth')
