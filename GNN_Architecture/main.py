@@ -189,4 +189,4 @@ for i in range(10):
 	        'graph_files/trained_model.pth')
 
 
-print(printtime.time())
+print(time.time() - start)
