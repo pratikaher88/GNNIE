@@ -114,7 +114,7 @@ class Cosine_PredictingLayer(nn.Module):
 
     def __init__(self, embed_dim: int):
         super(Cosine_PredictingLayer, self).__init__()
-        self.hidden_1 = nn.Linear((embed_dim * 2)+1, 128)
+        self.hidden_1 = nn.Linear((embed_dim * 2) + 1, 128)
         self.hidden_2 = nn.Linear(128, 32)
         self.output = nn.Linear(32, 1)
         self.relu = nn.ReLU()
