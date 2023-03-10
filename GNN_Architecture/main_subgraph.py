@@ -2,7 +2,7 @@ import dgl, torch, pickle
 import numpy as np
 import random
 from model import ConvModel
-from loss import max_margin_loss
+from loss import max_margin_loss, binary_cross_entropy_loss
 from settings import BASE_DIR
 
 np.random.seed(111)
@@ -109,6 +109,7 @@ for i in range(10):
         _, pos_score, neg_score = model(blocks, input_features, HM, pos_g, neg_g)
 
         loss = max_margin_loss(pos_score, neg_score)
+        # loss = binary_cross_entropy_loss(pos_score, neg_score)
 
         total_loss += loss.item()
 
