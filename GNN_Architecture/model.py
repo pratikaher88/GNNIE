@@ -1,7 +1,7 @@
 import torch.nn as nn
 import dgl.nn.pytorch as dglnn
 from layer import ConvLayer
-from prediction import CosinePrediction
+from prediction import CosinePrediction, PredictingModule, PredictingLayer, Cosine_PredictingModule, Cosine_PredictingLayer
 
 class NodeEmbedding(nn.Module):
     """
@@ -49,7 +49,16 @@ class ConvModel(nn.Module):
                  for etype in g.canonical_etypes},
                 aggregate=aggregator_hetero))
         
-        self.pred_fn = CosinePrediction()
+        # self.pred_fn = CosinePrediction()
+
+        if pred == 'cos':
+            self.pred_fn = CosinePrediction()
+        elif pred == 'nn':
+            self.pred_fn = PredictingModule(PredictingLayer, dim_dict['out_dim'])
+        elif pred == 'cos_nn':
+            self.pred_fn = Cosine_PredictingModule(Cosine_PredictingLayer, dim_dict['out_dim'])
+        else:
+            print("prediction function has not been specified!")
 
     def get_repr(self,
                  blocks,

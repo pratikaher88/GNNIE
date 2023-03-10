@@ -75,7 +75,7 @@ dgl.save_graphs(f"{BASE_DIR}/graph_files/valid_g.dgl", [valid_g])
 dgl.save_graphs(f"{BASE_DIR}/graph_files/test_g.dgl", [test_g])
 dgl.save_graphs(f"{BASE_DIR}/graph_files/ecommerce_hetero_graph_subgraph.dgl", [ecommerce_hetero_graph_subgraph])
 
-with open( f'{BASE_DIR}/f"{BASE_DIR}/graph_files/valid_eids_dict.pickle', 'wb') as f:
+with open( f'{BASE_DIR}/graph_files/valid_eids_dict.pickle', 'wb') as f:
     pickle.dump(valid_eids_dict, f, pickle.HIGHEST_PROTOCOL)
 
 # model building
@@ -127,4 +127,4 @@ for i in range(10):
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': total_loss}, 
-	        f'{BASE_DIR}f"{BASE_DIR}/graph_files/trained_model.pth')
+	        f'{BASE_DIR}/graph_files/trained_model.pth')
