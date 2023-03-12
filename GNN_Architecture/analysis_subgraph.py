@@ -78,7 +78,7 @@ print(valid_g)
 
 valid_dataloader = dgl.dataloading.DataLoader(ecommerce_hetero_graph_subgraph, valid_eids_dict, edge_sampler,  shuffle=True, drop_last= False, batch_size=1024, num_workers=0)
 
-y = {ntype: torch.zeros(valid_g.num_nodes(ntype), 64)
+train_embeddings = {ntype: torch.zeros(valid_g.num_nodes(ntype), 64)
          for ntype in valid_g.ntypes}
 
 for arg0 , pos_g, neg_g, blocks in valid_dataloader:
@@ -101,39 +101,46 @@ for arg0 , pos_g, neg_g, blocks in valid_dataloader:
 
     print("Output features shape", h['customer'].shape, h['product'].shape)
     for ntype in h.keys():
-        y[ntype][output_nodes[ntype]] = h[ntype]
+        train_embeddings[ntype][output_nodes[ntype]] = h[ntype]
 
-print(y['customer'][0], y['customer'].shape, y['product'].shape)
+print(train_embeddings['customer'][0], train_embeddings['customer'].shape, train_embeddings['product'].shape)
 
+print('zeros count', train_embeddings['product'][3].shape[0] - torch.count_nonzero(train_embeddings['product'][3]))
 
-user_ids = valid_g.num_nodes('customer')
+def get_model_recs():
+
+    user_ids = valid_g.num_nodes('customer')
+        
+    recs = {}
+
+    for user in range(user_ids):
+
+        already_rated = already_rated_dict[user]
+
+        user_emb = train_embeddings['customer'][user]
+        # user_emb_rpt = torch.cat(valid_g.num_nodes('product')*[user_emb]).reshape(-1, dim_dict['out_dim'])
+        user_emb_rpt = user_emb.repeat(valid_g.num_nodes('product'), 1)
+
+        # print("User embedding shape",y['product'].shape, user_emb_rpt.shape)
+        cos = nn.CosineSimilarity(dim=1, eps=1e-6)
+        ratings = cos(user_emb_rpt, train_embeddings['product'])
+        
+        ratings_formatted = ratings.detach().numpy().reshape(valid_g.num_nodes('product'),)
+        order = np.argsort(-ratings_formatted)
+        
+        order = [item for item in order if item not in already_rated]
+        
+        recs[user] = order
     
-recs = {}
-
-for user in range(user_ids):
-
-    already_rated = already_rated_dict[user]
-
-    user_emb = y['customer'][user]
-    # user_emb_rpt = torch.cat(valid_g.num_nodes('product')*[user_emb]).reshape(-1, dim_dict['out_dim'])
-    user_emb_rpt = user_emb.repeat(valid_g.num_nodes('product'), 1)
-
-    # print("User embedding shape",y['product'].shape, user_emb_rpt.shape)
-    cos = nn.CosineSimilarity(dim=1, eps=1e-6)
-    ratings = cos(user_emb_rpt, y['product'])
-    
-    ratings_formatted = ratings.detach().numpy().reshape(valid_g.num_nodes('product'),)
-    order = np.argsort(-ratings_formatted)
-    
-    order = [item for item in order if item not in already_rated]
-    
-    rec = order[:50]
-    recs[user] = rec
+    return recs
 
 # print(recs)
 
+model_recommendations = get_model_recs()
+print(len(model_recommendations[0]))
 
-def compare_rec(test_recs, model_recs):
+
+def compare_rec(ground_truth_recs, model_recs, threshold = 10):
   
   total = 0
   correct = 0 
@@ -141,20 +148,20 @@ def compare_rec(test_recs, model_recs):
   for key, value in model_recs.items():
 
     model_recs_list = model_recs[key]
-    test_recs_list = test_recs[key]
+    ground_truth_recs_list = ground_truth_recs[key][:10]
 
-    recommended_movies_correct = list(set(model_recs_list) & set(test_recs_list))
+    recommended_movies_correct = list(set(model_recs_list) & set(ground_truth_recs_list))
 
-    if len(set(test_recs_list)) > 0:
+    if len(set(ground_truth_recs_list)) > 0:
 
         # print("User ID", key, "Correctly predicted movies", recommended_movies_correct)
         # print("Total test values", len(recommended_movies_correct), "out of", len(set(test_recs_list)))
         
         correct += len(recommended_movies_correct)
-        total += len(set(test_recs_list))
+        total += len(set(ground_truth_recs_list))
     # print("Ratings", [ ratings_HM[movie_id] for movie_id in recommended_movies_correct ])
 
   return correct, total
 
 
-print(compare_rec(recommendations_from_valid_graph, recs))
+print(compare_rec(recommendations_from_valid_graph, model_recommendations))

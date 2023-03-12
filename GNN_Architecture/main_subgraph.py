@@ -14,22 +14,20 @@ ecommerce_hetero_graph = graphs[0]
 
 # ecommerce_hetero_graph_subgraph = ecommerce_hetero_graph.subgraph({ 'customer' :list(range(1000)), 'product': list(range(ecommerce_hetero_graph.num_nodes('product')))})
 
-ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph,
-                                                    {'orders': list(range(1000)), 'rev-orders': list(range(1000))})
+ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : list(range(1000)), 'rev-orders' : list(range(1000)) } )
 
 # ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : [random.randint(1, 10000) for i in range(1000)], 'rev-orders' : [random.randint(1, 10000) for i in range(1000)] } )
 
 print(ecommerce_hetero_graph_subgraph)
 
-print(ecommerce_hetero_graph_subgraph.ndata['features']['customer'].shape,
-      ecommerce_hetero_graph_subgraph.ndata['features']['product'].shape)
+print(ecommerce_hetero_graph_subgraph.ndata['features']['customer'].shape, ecommerce_hetero_graph_subgraph.ndata['features']['product'].shape)
 
 dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['features'].shape[1],
             'product': ecommerce_hetero_graph_subgraph.nodes['product'].data['features'].shape[1],
             'edge_dim': ecommerce_hetero_graph_subgraph.edges['orders'].data['features'].shape[1],
-            'hidden_dim': 128,
+            'hidden_dim' : 128,
             'out_dim': 64
-            }
+           }
 
 # Train test split
 
@@ -43,7 +41,7 @@ train_size = len(eids) - test_size - valid_size
 
 for e in ecommerce_hetero_graph_subgraph.etypes:
     train_eids_dict[e] = eids[:train_size]
-    valid_eids_dict[e] = eids[train_size:train_size + valid_size]
+    valid_eids_dict[e] = eids[train_size:train_size+valid_size]
     test_eids_dict[e] = eids[-test_size:]
 
 train_g = dgl.edge_subgraph(ecommerce_hetero_graph_subgraph, train_eids_dict, relabel_nodes=False)
@@ -60,12 +58,13 @@ edge_sampler = dgl.dataloading.EdgePredictionSampler(
     negative_sampler=neg_sampler,
     exclude='self')
 
-dataloader = dgl.dataloading.DataLoader(ecommerce_hetero_graph_subgraph, train_eids_dict,
-                                        edge_sampler, shuffle=True,
-                                        batch_size=1024, num_workers=0)
+dataloader = dgl.dataloading.DataLoader(ecommerce_hetero_graph_subgraph, train_eids_dict, 
+                                            edge_sampler,  shuffle=True, 
+                                            batch_size=1024, num_workers=0)
 
 num_batches = len(dataloader)
-print("Number of batches ", len(dataloader))
+print("Number of batches ",len(dataloader))
+
 
 # print(train_g.edata['features'])
 # save down graphs
@@ -76,14 +75,14 @@ dgl.save_graphs(f"{BASE_DIR}/graph_files/valid_g.dgl", [valid_g])
 dgl.save_graphs(f"{BASE_DIR}/graph_files/test_g.dgl", [test_g])
 dgl.save_graphs(f"{BASE_DIR}/graph_files/ecommerce_hetero_graph_subgraph.dgl", [ecommerce_hetero_graph_subgraph])
 
-with open(f'{BASE_DIR}/graph_files/valid_eids_dict.pickle', 'wb') as f:
+with open( f'{BASE_DIR}/graph_files/valid_eids_dict.pickle', 'wb') as f:
     pickle.dump(valid_eids_dict, f, pickle.HIGHEST_PROTOCOL)
 
 # model building
 
 
-model = ConvModel(ecommerce_hetero_graph_subgraph, 3, dim_dict, pred='cos_nn')
-optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, weight_decay=0)
+model = ConvModel(ecommerce_hetero_graph_subgraph, 3, dim_dict)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0001,weight_decay=0)
 
 for i in range(10):
 
@@ -100,18 +99,19 @@ for i in range(10):
 
         HM = {}
         for key, value in edge_features.items():
-            HM[key[1]] = (value,)
-
-        #     # print("Edge Features shape : ", HM['orders'][0].shape, HM['rev-orders'][0].shape)
-        #     # print(input_features)
-        #     # print(len(blocks))
+            HM[key[1]] = (value, )
+        
+    #     # print("Edge Features shape : ", HM['orders'][0].shape, HM['rev-orders'][0].shape)
+    #     # print(input_features)
+    #     # print(len(blocks))
 
         _, pos_score, neg_score = model(blocks, input_features, HM, pos_g, neg_g)
 
         loss = max_margin_loss(pos_score, neg_score)
-        # loss = binary_cross_entropy_loss(pos_score, neg_score)
 
         total_loss += loss.item()
+
+        # torch.nn.utils.clip_grad_norm_(model.parameters(), 0)
 
         optimizer.zero_grad()
         loss.backward()
@@ -120,13 +120,13 @@ for i in range(10):
         batch += 1
 
         # print(f'batch: {batch} of {num_batches}')
-
-    print(f'Total loss at epoch {i} :', total_loss)
+    
+    print(f'Total loss at epoch {i} :',total_loss)
 
     # torch.save(model, 'mpnn_model_save.pth')
     # torch.save(model.state_dict(), 'f"{BASE_DIR}/graph_files/trained_model.pth')
-    torch.save({'epoch': i,
-                'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-                'loss': total_loss},
-               f'{BASE_DIR}/graph_files/trained_model.pth')
+torch.save({'epoch': i,
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'loss': total_loss}, 
+        f'{BASE_DIR}/graph_files/trained_model.pth')
