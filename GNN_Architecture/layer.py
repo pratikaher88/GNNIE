@@ -18,26 +18,26 @@ class ConvLayer(nn.Module):
         # self.fc_neigh = nn.Linear(self._out_feats, out_feats, bias=False)
 
         self.fc_self = nn.Sequential(
-            nn.Linear(self._out_feats, out_feats, bias=False),
+            nn.Linear(self._out_feats, out_feats, bias=True),
             # nn.BatchNorm1d(out_feats),
-            nn.ReLU())
+            nn.Tanh())
         
         self.fc_neigh = nn.Sequential(
-          nn.Linear(self._out_feats, out_feats, bias=False),
+          nn.Linear(self._out_feats, out_feats, bias=True),
         #   nn.BatchNorm1d(out_feats),
-          nn.ReLU())
+          nn.Tanh())
 
         # self.fc_preagg = nn.Linear(self._in_neigh_feats, self._out_feats, bias=False)
         self.fc_preagg = nn.Sequential(
-          nn.Linear(self._in_neigh_feats, self._out_feats, bias=False),
+          nn.Linear(self._in_neigh_feats, self._out_feats, bias=True),
         #   nn.BatchNorm1d(self._out_feats),
-          nn.ReLU())
+          nn.Tanh())
         
 
         self.edge_fc = nn.Sequential(
-        nn.Linear(edge_dim, self._out_feats*self._out_feats),
+        nn.Linear(edge_dim, self._out_feats*self._out_feats,bias=True),
         # nn.BatchNorm1d(self._out_feats*self._out_feats),
-        nn.ReLU())
+        nn.Tanh())
 
         # self.edge_fc = nn.Linear(edge_dim, self._out_feats*self._out_feats)
         self.edge_dim = edge_dim

@@ -14,6 +14,11 @@ class NodeEmbedding(nn.Module):
         super().__init__()
         self.proj_feats = nn.Linear(in_feats, out_feats)
 
+        # self.proj_feats = nn.Sequential(
+        #     nn.Linear(in_feats, out_feats),
+        #     # nn.BatchNorm1d(out_feats),
+        #     nn.Sigmoid())
+
     def forward(self,
                 node_feats):
         x = self.proj_feats(node_feats)
@@ -21,7 +26,7 @@ class NodeEmbedding(nn.Module):
 
 class ConvModel(nn.Module):
 
-    def __init__(self, g, n_layers, dim_dict, norm: bool = True, dropout: float = 0.0, aggregator_type: str = 'mean', pred: str = 'cos', aggregator_hetero: str = 'sum', embedding_layer: bool = True):
+    def __init__(self, g, n_layers, dim_dict, norm: bool = True, dropout: float = 0.0, aggregator_type: str = 'mean', pred: str = 'cos_nn', aggregator_hetero: str = 'sum', embedding_layer: bool = True):
         
         super(ConvModel, self).__init__()
 
@@ -54,9 +59,9 @@ class ConvModel(nn.Module):
         if pred == 'cos':
             self.pred_fn = CosinePrediction()
         elif pred == 'nn':
-            self.pred_fn = PredictingModule(PredictingLayer, dim_dict['out_dim'])
+            self.pred_fn = PredictingModule(dim_dict['out_dim'])
         elif pred == 'cos_nn':
-            self.pred_fn = Cosine_PredictingModule(Cosine_PredictingLayer, dim_dict['out_dim'])
+            self.pred_fn = Cosine_PredictingModule(dim_dict['out_dim'])
         else:
             print("prediction function has not been specified!")
 
@@ -102,7 +107,7 @@ class ConvModel(nn.Module):
 
             h = self.get_repr(blocks, h, edge_features)
 
-            print("H-value", h['customer'].shape, h['product'].shape)
+            # print("H-value", h['customer'].shape, h['product'].shape)
 
             # print("graphs", pos_g, neg_g)
 

@@ -71,9 +71,9 @@ class PredictingModule(nn.Module):
         - Returns ratings (sigmoid function).
     """
 
-    def __init__(self, predicting_layer, embed_dim: int):
+    def __init__(self,embed_dim: int):
         super(PredictingModule, self).__init__()
-        self.layer_nn = predicting_layer(embed_dim)
+        self.layer_nn = Cosine_PredictingLayer(embed_dim)
 
     def forward(self,
                 graph,
@@ -81,7 +81,7 @@ class PredictingModule(nn.Module):
                 ):
         ratings_dict = {}
         for etype in graph.canonical_etypes:
-            print(etype)
+            # print(etype)
             if etype[0] in ['customer', 'product'] and etype[2] in ['customer', 'product']:
                 utype, _, vtype = etype
                 src_nid, dst_nid = graph.all_edges(etype=etype)
@@ -139,9 +139,9 @@ class Cosine_PredictingModule(nn.Module):
         - Returns ratings (sigmoid function).
     """
 
-    def __init__(self, predicting_layer, embed_dim: int):
+    def __init__(self, embed_dim: int):
         super(Cosine_PredictingModule, self).__init__()
-        self.layer_nn = predicting_layer(embed_dim)
+        self.layer_nn = Cosine_PredictingLayer(embed_dim)
 
     def forward(self,
                 graph,

@@ -2,7 +2,7 @@ import dgl, torch, pickle
 import numpy as np
 import random
 from model import ConvModel
-from loss import max_margin_loss
+from loss import max_margin_loss, binary_cross_entropy_loss
 from settings import BASE_DIR
 
 np.random.seed(111)
@@ -111,6 +111,8 @@ for i in range(10):
 
         total_loss += loss.item()
 
+        # torch.nn.utils.clip_grad_norm_(model.parameters(), 0)
+
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
@@ -123,8 +125,8 @@ for i in range(10):
 
     # torch.save(model, 'mpnn_model_save.pth')
     # torch.save(model.state_dict(), 'f"{BASE_DIR}/graph_files/trained_model.pth')
-    torch.save({'epoch': i,
-            'model_state_dict': model.state_dict(),
-            'optimizer_state_dict': optimizer.state_dict(),
-            'loss': total_loss}, 
-	        f'{BASE_DIR}/graph_files/trained_model.pth')
+torch.save({'epoch': i,
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'loss': total_loss}, 
+        f'{BASE_DIR}/graph_files/trained_model.pth')
