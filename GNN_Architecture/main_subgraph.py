@@ -7,7 +7,7 @@ from settings import BASE_DIR
 
 np.random.seed(111)
 
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/ecommerce_hetero_graph.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/ecommerce_hetero_graph.dgl")
 ecommerce_hetero_graph = graphs[0]
 
 # subgraph
@@ -70,12 +70,12 @@ print("Number of batches ",len(dataloader))
 # save down graphs
 
 # save down graphs
-dgl.save_graphs(f"{BASE_DIR}/graph_files/train_g.dgl", [train_g])
-dgl.save_graphs(f"{BASE_DIR}/graph_files/valid_g.dgl", [valid_g])
-dgl.save_graphs(f"{BASE_DIR}/graph_files/test_g.dgl", [test_g])
-dgl.save_graphs(f"{BASE_DIR}/graph_files/ecommerce_hetero_graph_subgraph.dgl", [ecommerce_hetero_graph_subgraph])
+dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/train_g.dgl", [train_g])
+dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/valid_g.dgl", [valid_g])
+dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/test_g.dgl", [test_g])
+dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/ecommerce_hetero_graph_subgraph.dgl", [ecommerce_hetero_graph_subgraph])
 
-with open( f'{BASE_DIR}/graph_files/valid_eids_dict.pickle', 'wb') as f:
+with open( f'{BASE_DIR}/graph_files_subgraph/valid_eids_dict.pickle', 'wb') as f:
     pickle.dump(valid_eids_dict, f, pickle.HIGHEST_PROTOCOL)
 
 # model building
@@ -129,4 +129,4 @@ torch.save({'epoch': i,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
         'loss': total_loss}, 
-        f'{BASE_DIR}/graph_files/trained_model.pth')
+        f'{BASE_DIR}/graph_files_subgraph/trained_model.pth')

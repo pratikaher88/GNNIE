@@ -6,16 +6,16 @@ from collections import defaultdict
 import numpy as np
 from settings import BASE_DIR
 
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/ecommerce_hetero_graph_subgraph.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/ecommerce_hetero_graph_subgraph.dgl")
 ecommerce_hetero_graph_subgraph = graphs[0]
 
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/train_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/train_g.dgl")
 train_g = graphs[0]
 
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/test_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/test_g.dgl")
 test_g = graphs[0]
 
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/valid_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/valid_g.dgl")
 valid_g = graphs[0]
 
 dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['features'].shape[1],
@@ -25,7 +25,7 @@ dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['
             'out_dim': 64
            }
 
-saved_model = torch.load(f"{BASE_DIR}/graph_files/trained_model.pth")
+saved_model = torch.load(f"{BASE_DIR}/graph_files_subgraph/trained_model.pth")
 
 mpnn_model = ConvModel(ecommerce_hetero_graph_subgraph, 3, dim_dict)
 mpnn_model.load_state_dict(saved_model['model_state_dict'])
@@ -42,8 +42,13 @@ def get_test_recs(g):
     
     for key, val in already_rated_arr:
         test_rated_dict[key].append(val)
+    
+    final_history = defaultdict(list)
+    for key, value in test_rated_dict.items():
+        final_history[key] = list(set(value))
         
-    return test_rated_dict
+    return final_history
+    # return test_rated_dict
 
 def create_already_rated(g):
     
@@ -78,7 +83,7 @@ print(valid_g)
 
 valid_dataloader = dgl.dataloading.DataLoader(ecommerce_hetero_graph_subgraph, valid_eids_dict, edge_sampler,  shuffle=True, drop_last= False, batch_size=1024, num_workers=0)
 
-train_embeddings = {ntype: torch.zeros(valid_g.num_nodes(ntype), 64)
+train_embeddings = {ntype: torch.zeros(valid_g.num_nodes(ntype), dim_dict['out_dim'])
          for ntype in valid_g.ntypes}
 
 for arg0 , pos_g, neg_g, blocks in valid_dataloader:
@@ -103,9 +108,9 @@ for arg0 , pos_g, neg_g, blocks in valid_dataloader:
     for ntype in h.keys():
         train_embeddings[ntype][output_nodes[ntype]] = h[ntype]
 
-print(train_embeddings['customer'][0], train_embeddings['customer'].shape, train_embeddings['product'].shape)
+print(train_embeddings['customer'][1], train_embeddings['customer'].shape, train_embeddings['product'].shape)
 
-print('zeros count', train_embeddings['product'][3].shape[0] - torch.count_nonzero(train_embeddings['product'][3]))
+print('zeros count : ', (train_embeddings['product'][5].shape[0] - torch.count_nonzero(train_embeddings['product'][5])).item(), "out of",train_embeddings['product'][5].shape[0])
 
 def get_model_recs():
 
@@ -128,7 +133,7 @@ def get_model_recs():
         ratings_formatted = ratings.detach().numpy().reshape(valid_g.num_nodes('product'),)
         order = np.argsort(-ratings_formatted)
         
-        order = [item for item in order if item not in already_rated]
+        # order = [item for item in order if item not in already_rated]
         
         recs[user] = order
     
@@ -137,7 +142,6 @@ def get_model_recs():
 # print(recs)
 
 model_recommendations = get_model_recs()
-print(len(model_recommendations[0]))
 
 
 def compare_rec(ground_truth_recs, model_recs, threshold = 10):

@@ -18,25 +18,25 @@ class ConvLayer(nn.Module):
         # self.fc_neigh = nn.Linear(self._out_feats, out_feats, bias=False)
 
         self.fc_self = nn.Sequential(
-            nn.Linear(self._out_feats, out_feats, bias=True),
-            # nn.BatchNorm1d(out_feats),
+            nn.Linear(self._out_feats, out_feats, bias=False),
+            nn.BatchNorm1d(out_feats),
             nn.Tanh())
         
         self.fc_neigh = nn.Sequential(
-          nn.Linear(self._out_feats, out_feats, bias=True),
-        #   nn.BatchNorm1d(out_feats),
+          nn.Linear(self._out_feats, out_feats, bias=False),
+          nn.BatchNorm1d(out_feats),
           nn.Tanh())
 
         # self.fc_preagg = nn.Linear(self._in_neigh_feats, self._out_feats, bias=False)
         self.fc_preagg = nn.Sequential(
-          nn.Linear(self._in_neigh_feats, self._out_feats, bias=True),
-        #   nn.BatchNorm1d(self._out_feats),
+          nn.Linear(self._in_neigh_feats, self._out_feats, bias=False),
+          nn.BatchNorm1d(self._out_feats),
           nn.Tanh())
         
 
         self.edge_fc = nn.Sequential(
-        nn.Linear(edge_dim, self._out_feats*self._out_feats,bias=True),
-        # nn.BatchNorm1d(self._out_feats*self._out_feats),
+        nn.Linear(edge_dim, self._out_feats*self._out_feats,bias=False),
+        nn.BatchNorm1d(self._out_feats*self._out_feats),
         nn.Tanh())
 
         # self.edge_fc = nn.Linear(edge_dim, self._out_feats*self._out_feats)
@@ -53,11 +53,13 @@ class ConvLayer(nn.Module):
     def forward(self, graph, x, edge_features):
         
         # print('------------')
-        # print(graph, x[0].shape, x[1].shape)
-
         # print("Edge feature - pre shape", edge_features.shape)
 
         h_neigh, h_self = x
+
+        # if (h_neigh.shape != self.fc_preagg(h_neigh).shape or h_self.shape != self.fc_preagg(h_self).shape ):
+        #     print(h_neigh.shape , self.fc_preagg(h_neigh).shape)
+
         h_neigh = self.dropout_fn(self.fc_preagg(h_neigh))
         h_self = self.dropout_fn(self.fc_preagg(h_self))
         # include edge weights
