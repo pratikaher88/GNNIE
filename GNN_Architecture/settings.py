@@ -1,2 +1,2 @@
 
-BASE_DIR = 'GNN_Architecture/run_data'
+BASE_DIR = 'run_data'
