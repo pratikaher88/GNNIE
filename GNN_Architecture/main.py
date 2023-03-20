@@ -12,7 +12,7 @@ np.random.seed(111)
 # graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/train_g.dgl")
 # train_g = graphs[0]
 
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/ecommerce_hetero_graph.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_full/ecommerce_hetero_graph.dgl")
 ecommerce_hetero_graph = graphs[0]
 
 # eids = np.arange(ecommerce_hetero_graph.number_of_edges(etype='orders'))
@@ -185,7 +185,7 @@ for i in range(10):
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': total_loss}, 
-	        f'{BASE_DIR}/graph_files/trained_model.pth')
+	        f'{BASE_DIR}/graph_files_full/trained_model.pth')
 
 
 print(time.time() - start)
