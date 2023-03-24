@@ -10,19 +10,19 @@ from settings import BASE_DIR
 print(time.time())
 
 
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_full/ecommerce_hetero_graph_subgraph.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_file_vmcloud/ecommerce_hetero_graph_subgraph.dgl")
 ecommerce_hetero_graph_subgraph = graphs[0]
 
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}graph_files_full/ecommerce_hetero_graph.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_file_vmcloud/ecommerce_hetero_graph.dgl")
 ecommerce_hetero_graph = graphs[0]
 
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_full/train_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_file_vmcloud/train_g.dgl")
 train_g = graphs[0]
 
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_full/test_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_file_vmcloud/test_g.dgl")
 test_g = graphs[0]
 
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_full/valid_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_file_vmcloud/valid_g.dgl")
 valid_g = graphs[0]
 
 dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['features'].shape[1],
