@@ -4,7 +4,7 @@
 # In[5]:
 
 
-from model import ConvModel
+from Model.model import ConvModel
 import dgl, torch
 import torch.nn as nn
 import numpy as np
