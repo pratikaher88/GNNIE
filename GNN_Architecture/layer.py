@@ -34,10 +34,17 @@ class ConvLayer(nn.Module):
           nn.Tanh())
         
 
+        # self.edge_fc = nn.Sequential(
+        # nn.Linear(edge_dim, self._out_feats*self._out_feats,bias=False),
+        # nn.BatchNorm1d(self._out_feats*self._out_feats),
+        # nn.Tanh(),
+        # )
+
         self.edge_fc = nn.Sequential(
-        nn.Linear(edge_dim, self._out_feats*self._out_feats,bias=False),
-        nn.BatchNorm1d(self._out_feats*self._out_feats),
-        nn.Tanh())
+            nn.Linear(edge_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, self._out_feats*self._out_feats)
+        )
 
         # self.edge_fc = nn.Linear(edge_dim, self._out_feats*self._out_feats)
         self.edge_dim = edge_dim

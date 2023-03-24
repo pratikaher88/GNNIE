@@ -45,7 +45,8 @@ def hit_rate_accuracy(test_recs, recommendations, K):
         hits += sum(edge in v for edge in recommendations.get(k)[:K])
         total = total + K
     
-    return hits/total
+    return hits
+    # return hits/total
 
 def hit_rate_recall(test_recs, recommendations, K):
     

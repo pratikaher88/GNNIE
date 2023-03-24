@@ -5,7 +5,7 @@ from model import ConvModel
 from loss import max_margin_loss, binary_cross_entropy_loss
 from settings import BASE_DIR
 
-np.random.seed(111)
+np.random.seed(42)
 
 graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/ecommerce_hetero_graph.dgl")
 ecommerce_hetero_graph = graphs[0]
@@ -14,7 +14,7 @@ ecommerce_hetero_graph = graphs[0]
 
 # ecommerce_hetero_graph_subgraph = ecommerce_hetero_graph.subgraph({ 'customer' :list(range(1000)), 'product': list(range(ecommerce_hetero_graph.num_nodes('product')))})
 
-ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : list(range(1000)), 'rev-orders' : list(range(1000)) } )
+ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : list(range(10000)), 'rev-orders' : list(range(10000)) } )
 
 # ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : [random.randint(1, 10000) for i in range(1000)], 'rev-orders' : [random.randint(1, 10000) for i in range(1000)] } )
 

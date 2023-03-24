@@ -3,7 +3,7 @@ import numpy as np
 from model import ConvModel
 from loss import max_margin_loss
 import time
-from settings import BASE_DIR
+from settings import BASE_DIR, MODEL_DIR
 
 start = time.time()
 
@@ -12,7 +12,7 @@ np.random.seed(111)
 # graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/train_g.dgl")
 # train_g = graphs[0]
 
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_full/ecommerce_hetero_graph.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/{MODEL_DIR}/ecommerce_hetero_graph.dgl")
 ecommerce_hetero_graph = graphs[0]
 
 # eids = np.arange(ecommerce_hetero_graph.number_of_edges(etype='orders'))
@@ -80,10 +80,10 @@ test_g = dgl.edge_subgraph(ecommerce_hetero_graph, test_eids_dict, relabel_nodes
 # Fix this
 
 # save down graphs
-dgl.save_graphs(f"{BASE_DIR}/graph_files_full/train_g.dgl", [train_g])
-dgl.save_graphs(f"{BASE_DIR}/graph_files_full/valid_g.dgl", [valid_g])
-dgl.save_graphs(f"{BASE_DIR}/graph_files_full/test_g.dgl", [test_g])
-dgl.save_graphs(f"{BASE_DIR}/graph_files_full/ecommerce_hetero_graph.dgl", [ecommerce_hetero_graph])
+dgl.save_graphs(f"{BASE_DIR}/{MODEL_DIR}/train_g.dgl", [train_g])
+dgl.save_graphs(f"{BASE_DIR}/{MODEL_DIR}/valid_g.dgl", [valid_g])
+dgl.save_graphs(f"{BASE_DIR}/{MODEL_DIR}/test_g.dgl", [test_g])
+dgl.save_graphs(f"{BASE_DIR}/{MODEL_DIR}/ecommerce_hetero_graph.dgl", [ecommerce_hetero_graph])
 
 # dataloader = dgl.dataloading.DataLoader(
 #     train_g, ids_dict, sampler,
@@ -185,7 +185,7 @@ for i in range(10):
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': total_loss}, 
-	        f'{BASE_DIR}/graph_files_full/trained_model.pth')
+	        f'{BASE_DIR}/{MODEL_DIR}/trained_model.pth')
 
 
 print(time.time() - start)

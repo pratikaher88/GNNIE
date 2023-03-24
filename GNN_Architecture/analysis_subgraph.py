@@ -1,6 +1,7 @@
 from model import ConvModel
 import dgl, torch
 import torch.nn as nn
+import baseline_model_generator
 
 from collections import defaultdict
 import numpy as np
@@ -169,3 +170,20 @@ def compare_rec(ground_truth_recs, model_recs, threshold = 10):
 
 
 print(compare_rec(recommendations_from_valid_graph, model_recommendations))
+random_model = baseline_model_generator.generate_random_model(ecommerce_hetero_graph_subgraph, 'customer', 'product')
+baseline_model = baseline_model_generator.generate_popularity_model(ecommerce_hetero_graph_subgraph, 'orders', 'customer')
+
+HM = defaultdict(list)
+for key, value in recommendations_from_valid_graph.items():
+    HM[key] = list(set(value))
+
+print(HM[446])
+print(model_recommendations[446])
+print(model_recommendations[0])
+
+from evaluation_metrics import mmr,hit_rate_accuracy
+
+print("MMR GNN Model: ", hit_rate_accuracy(HM, model_recommendations, 10))
+print("MMR Random Model: ", hit_rate_accuracy(HM, random_model, 10))
+print("MMR Popularity Model: ", hit_rate_accuracy(HM, baseline_model, 10))
+
