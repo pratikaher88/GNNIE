@@ -10,8 +10,8 @@ from settings import BASE_DIR
 print(time.time())
 
 
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_file_vmcloud/ecommerce_hetero_graph_subgraph.dgl")
-ecommerce_hetero_graph_subgraph = graphs[0]
+# graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_file_vmcloud/ecommerce_hetero_graph_subgraph.dgl")
+# ecommerce_hetero_graph_subgraph = graphs[0]
 
 graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_file_vmcloud/ecommerce_hetero_graph.dgl")
 ecommerce_hetero_graph = graphs[0]
@@ -25,16 +25,16 @@ test_g = graphs[0]
 graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_file_vmcloud/valid_g.dgl")
 valid_g = graphs[0]
 
-dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['features'].shape[1],
-            'product': ecommerce_hetero_graph_subgraph.nodes['product'].data['features'].shape[1],
-            'edge_dim': ecommerce_hetero_graph_subgraph.edges['orders'].data['features'].shape[1],
+dim_dict = {'customer': ecommerce_hetero_graph.nodes['customer'].data['features'].shape[1],
+            'product': ecommerce_hetero_graph.nodes['product'].data['features'].shape[1],
+            'edge_dim': ecommerce_hetero_graph.edges['orders'].data['features'].shape[1],
             'hidden_dim' : 128,
             'out_dim': 64
            }
 
 saved_model = torch.load(f'{BASE_DIR}/graph_files_full/trained_model.pth')
 
-mpnn_model = ConvModel(ecommerce_hetero_graph_subgraph, 3, dim_dict)
+mpnn_model = ConvModel(ecommerce_hetero_graph, 3, dim_dict)
 mpnn_model.load_state_dict(saved_model['model_state_dict'])
 mpnn_model.eval()
 
