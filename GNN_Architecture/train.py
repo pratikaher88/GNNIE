@@ -181,6 +181,7 @@ for i in range(10):
     print(f'Total loss at epoch {i} :',total_loss)
     # torch.save(model, 'mpnn_model_save.pth')
     # torch.save(model.state_dict(), 'graph_files/trained_model.pth')
+    
     torch.save({'epoch': i,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),

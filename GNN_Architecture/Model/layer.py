@@ -1,6 +1,7 @@
 import torch.nn as nn
 import dgl.function as fn
 import torch.nn.functional as F
+import torch
 
 # TO DO : not sure how this architecture will affect things
 class ConvLayer(nn.Module):
@@ -64,6 +65,8 @@ class ConvLayer(nn.Module):
 
         h_neigh, h_self = x
 
+        # print("Shape", h_neigh.shape, h_self.shape )
+
         # if (h_neigh.shape != self.fc_preagg(h_neigh).shape or h_self.shape != self.fc_preagg(h_self).shape ):
         #     print(h_neigh.shape , self.fc_preagg(h_neigh).shape)
 
@@ -79,10 +82,22 @@ class ConvLayer(nn.Module):
 
         graph.srcdata['h'] = h_neigh
 
-        graph.update_all(
-            fn.u_mul_e('h', 'edge_weights', 'm'),
-            fn.mean('m', 'neigh'))
+        if self._aggre_type == 'max':
+            graph.update_all(
+                fn.u_mul_e('h', 'edge_weights', 'm'),
+                fn.max('m', 'neigh'))
         
+        if self._aggre_type == 'sum':
+            graph.update_all(
+                fn.u_mul_e('h', 'edge_weights', 'm'),
+                fn.sum('m', 'neigh'))
+
+        elif self._aggre_type == 'mean':
+
+            graph.update_all(
+                fn.u_mul_e('h', 'edge_weights', 'm'),
+                fn.mean('m', 'neigh'))
+            
         # graph.update_all(
         #     fn.copy_src('h', 'm'),
         #     fn.mean('m', 'neigh'))
@@ -91,10 +106,17 @@ class ConvLayer(nn.Module):
 
         # print("Final shape", h_neigh.shape, h_self.shape, (h_neigh+h_self).shape)
 
+        # Experiment : can get rid of this
         z = self.fc_self(h_self) + self.fc_neigh(h_neigh)
         # z = h_neigh+h_self
 
         z = F.relu(z)
+
+        z_norm = z.norm(2, 1, keepdim=True)
+        z_norm = torch.where(z_norm == 0,
+                                torch.tensor(1.).to(z_norm),
+                                z_norm)
+        z = z / z_norm
 
         # print("H out", z.shape)
 

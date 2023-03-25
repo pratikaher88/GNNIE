@@ -81,7 +81,7 @@ with open( f'{BASE_DIR}/graph_files_subgraph/valid_eids_dict.pickle', 'wb') as f
 # model building
 
 
-model = ConvModel(ecommerce_hetero_graph_subgraph, 3, dim_dict)
+model = ConvModel(ecommerce_hetero_graph_subgraph, 3, dim_dict, aggregator_type='mean')
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0001,weight_decay=0)
 
 for i in range(10):
