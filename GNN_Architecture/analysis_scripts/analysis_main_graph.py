@@ -1,7 +1,7 @@
 from Model.model import ConvModel
 import dgl, torch
 import torch.nn as nn
-import baseline_model_generator
+from evaluation import baseline_model_generator
 
 from collections import defaultdict
 import numpy as np
@@ -184,9 +184,9 @@ print(HM[446])
 print(model_recommendations[446])
 print(model_recommendations[0])
 
-from evaluation_metrics import mmr,hit_rate_accuracy
+from evaluation.evaluation_metrics import mmr,hit_rate_accuracy
 
-print("MMR GNN Model: ", hit_rate_accuracy(HM, model_recommendations, 10))
+# print("MMR GNN Model: ", hit_rate_accuracy(HM, model_recommendations, 10))
 print("MMR Random Model: ", hit_rate_accuracy(HM, random_model, 10))
 print("MMR Popularity Model: ", hit_rate_accuracy(HM, baseline_model, 10))
 

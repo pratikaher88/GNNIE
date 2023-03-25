@@ -1,11 +1,18 @@
 from Model.model import ConvModel
-import dgl, torch
+import dgl, torch, os, yaml
 import torch.nn as nn
-import baseline_model_generator
-
+from evaluation import baseline_model_generator
 from collections import defaultdict
 import numpy as np
-from settings import BASE_DIR
+from settings import BASE_DIR, CONFIG_PATH
+
+# Function to load yaml configuration file
+def load_config(config_name):
+    with open(os.path.join(f"{CONFIG_PATH}", config_name)) as file:
+        config = yaml.safe_load(file)
+    return config
+
+model_config = load_config("model_config.yml")
 
 graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/ecommerce_hetero_graph_subgraph.dgl")
 ecommerce_hetero_graph_subgraph = graphs[0]
@@ -22,13 +29,13 @@ valid_g = graphs[0]
 dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['features'].shape[1],
             'product': ecommerce_hetero_graph_subgraph.nodes['product'].data['features'].shape[1],
             'edge_dim': ecommerce_hetero_graph_subgraph.edges['orders'].data['features'].shape[1],
-            'hidden_dim' : 128,
-            'out_dim': 64
+            'hidden_dim' : model_config['hidden_dim'],
+            'out_dim': model_config['out_dim']
            }
 
 saved_model = torch.load(f"{BASE_DIR}/graph_files_subgraph/trained_model.pth")
 
-mpnn_model = ConvModel(ecommerce_hetero_graph_subgraph, 3, dim_dict)
+mpnn_model = ConvModel(ecommerce_hetero_graph_subgraph, model_config['num_layers'], dim_dict)
 mpnn_model.load_state_dict(saved_model['model_state_dict'])
 mpnn_model.eval()
 
@@ -109,7 +116,7 @@ for arg0 , pos_g, neg_g, blocks in valid_dataloader:
     for ntype in h.keys():
         train_embeddings[ntype][output_nodes[ntype]] = h[ntype]
 
-print(train_embeddings['customer'][1], train_embeddings['customer'].shape, train_embeddings['product'].shape)
+print(train_embeddings['customer'][1].shape, train_embeddings['customer'].shape, train_embeddings['product'].shape)
 
 print('zeros count : ', (train_embeddings['product'][5].shape[0] - torch.count_nonzero(train_embeddings['product'][5])).item(), "out of",train_embeddings['product'][5].shape[0])
 
@@ -177,13 +184,17 @@ HM = defaultdict(list)
 for key, value in recommendations_from_valid_graph.items():
     HM[key] = list(set(value))
 
-print(HM[446])
-print(model_recommendations[446])
-print(model_recommendations[0])
+# print(HM[446])
+print(model_recommendations[446][:20], len(model_recommendations[446]))
+# print(model_recommendations[0][:20], len(model_recommendations[0]))
+# print(model_recommendations)
+print(baseline_model[446][:20], len(baseline_model[446]))
 
-from evaluation_metrics import mmr,hit_rate_accuracy
 
-print("MMR GNN Model: ", hit_rate_accuracy(HM, model_recommendations, 10))
-print("MMR Random Model: ", hit_rate_accuracy(HM, random_model, 10))
-print("MMR Popularity Model: ", hit_rate_accuracy(HM, baseline_model, 10))
+
+from evaluation.evaluation_metrics import mmr,hit_rate_accuracy
+
+print("MMR GNN Model: ", hit_rate_accuracy(HM, model_recommendations, 40))
+print("MMR Random Model: ", hit_rate_accuracy(HM, random_model, 40))
+print("MMR Popularity Model: ", hit_rate_accuracy(HM, baseline_model, 40))
 
