@@ -74,7 +74,7 @@ class ConvModel(nn.Module):
         
         for i in range(len(blocks)):
             layer = self.layers[i]
-            print(f"layer {i} of {len(self.layers)}")
+            # print(f"layer {i} of {len(self.layers)}")
 
             edge_features = blocks[i].edata['features']
 

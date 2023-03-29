@@ -29,8 +29,9 @@ valid_g = graphs[0]
 dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['features'].shape[1],
             'product': ecommerce_hetero_graph_subgraph.nodes['product'].data['features'].shape[1],
             'edge_dim': ecommerce_hetero_graph_subgraph.edges['orders'].data['features'].shape[1],
+            'edge_hidden_dim': model_config['edge_hidden_dim'],
             'hidden_dim' : model_config['hidden_dim'],
-            'out_dim': model_config['out_dim']
+            'out_dim': model_config['output_dim']
            }
 
 saved_model = torch.load(f"{BASE_DIR}/graph_files_subgraph/trained_model.pth")

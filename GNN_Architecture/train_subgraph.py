@@ -126,7 +126,7 @@ for i in range(10):
 
         batch += 1
 
-        # print(f'batch: {batch} of {num_batches}')
+        print(f'batch: {batch} of {num_batches}')
     
     print(f'Total loss at epoch {i} :',total_loss)
 
@@ -137,3 +137,5 @@ torch.save({'epoch': i,
         'optimizer_state_dict': optimizer.state_dict(),
         'loss': total_loss}, 
         f'{BASE_DIR}/graph_files_subgraph/trained_model.pth')
+
+print("Training complete: saved model to :", f'{BASE_DIR}/graph_files_subgraph/trained_model.pth')

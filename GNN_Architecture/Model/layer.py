@@ -65,7 +65,7 @@ class ConvLayer(nn.Module):
 
         h_neigh, h_self = x
 
-        print("Shape", h_neigh.shape, h_self.shape, self._in_self_feats, self._out_feats, h_neigh.unsqueeze(-1).shape, h_self.unsqueeze(-1).shape )
+        # print("Shape", h_neigh.shape, h_self.shape, self._in_self_feats, self._out_feats, h_neigh.unsqueeze(-1).shape, h_self.unsqueeze(-1).shape )
 
         # if (h_neigh.shape != self.fc_preagg(h_neigh).shape or h_self.shape != self.fc_preagg(h_self).shape ):
         #     print(h_neigh.shape , self.fc_preagg(h_neigh).shape)

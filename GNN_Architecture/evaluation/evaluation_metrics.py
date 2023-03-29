@@ -1,14 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[6]:
-
-
 import numpy as np
 from collections import defaultdict
-
-
-# In[14]:
 
 
 """
@@ -58,8 +52,6 @@ def hit_rate_recall(test_recs, recommendations, K):
 
     return hits/total
 
-
-# In[4]:
 
 
 """
