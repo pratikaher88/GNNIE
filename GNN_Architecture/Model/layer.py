@@ -6,34 +6,34 @@ import torch
 # TO DO : not sure how this architecture will affect things
 class ConvLayer(nn.Module):
 
-    def __init__(self, in_feats, out_feats, edge_dim, dropout, aggregator_type, norm):
+    def __init__(self, in_feats, out_feats, edge_dim, edge_hidden_dim,dropout, aggregator_type, norm):
 
         super().__init__()
 
         self._in_neigh_feats, self._in_self_feats = in_feats
         self._out_feats = out_feats
         self._aggre_type = aggregator_type
+        self._edge_hidden_dim = edge_hidden_dim
         self.norm = norm
         self.dropout_fn = nn.Dropout(dropout)
         # self.fc_self = nn.Linear(self._out_feats, out_feats, bias=False)
         # self.fc_neigh = nn.Linear(self._out_feats, out_feats, bias=False)
 
         self.fc_self = nn.Sequential(
-            nn.Linear(self._out_feats, out_feats, bias=False),
+            nn.Linear(self._in_self_feats, out_feats, bias=False),
             nn.BatchNorm1d(out_feats),
             nn.Tanh())
         
         self.fc_neigh = nn.Sequential(
-          nn.Linear(self._out_feats, out_feats, bias=False),
+          nn.Linear(self._in_neigh_feats, out_feats, bias=False),
           nn.BatchNorm1d(out_feats),
           nn.Tanh())
 
         # self.fc_preagg = nn.Linear(self._in_neigh_feats, self._out_feats, bias=False)
-        self.fc_preagg = nn.Sequential(
-          nn.Linear(self._in_neigh_feats, self._out_feats, bias=False),
-          nn.BatchNorm1d(self._out_feats),
-          nn.Tanh())
-        
+        # self.fc_preagg = nn.Sequential(
+        #   nn.Linear(self._in_neigh_feats, self._out_feats, bias=False),
+        #   nn.BatchNorm1d(self._out_feats),
+        #   nn.Tanh())
 
         # self.edge_fc = nn.Sequential(
         # nn.Linear(edge_dim, self._out_feats*self._out_feats,bias=False),
@@ -42,9 +42,9 @@ class ConvLayer(nn.Module):
         # )
 
         self.edge_fc = nn.Sequential(
-            nn.Linear(edge_dim, 128),
+            nn.Linear(edge_dim, self._edge_hidden_dim),
             nn.ReLU(),
-            nn.Linear(128, self._out_feats*self._out_feats)
+            nn.Linear(self._edge_hidden_dim, self._in_neigh_feats*self._out_feats)
         )
 
         # self.edge_fc = nn.Linear(edge_dim, self._out_feats*self._out_feats)
@@ -55,7 +55,7 @@ class ConvLayer(nn.Module):
         gain = nn.init.calculate_gain('relu')
         nn.init.xavier_uniform_(self.fc_self[0].weight, gain=gain)
         nn.init.xavier_uniform_(self.fc_neigh[0].weight, gain=gain)
-        nn.init.xavier_uniform_(self.fc_preagg[0].weight, gain=gain)
+        # nn.init.xavier_uniform_(self.fc_preagg[0].weight, gain=gain)
         nn.init.xavier_uniform_(self.edge_fc[0].weight, gain=gain)
 
     def forward(self, graph, x, edge_features):
@@ -65,22 +65,25 @@ class ConvLayer(nn.Module):
 
         h_neigh, h_self = x
 
-        # print("Shape", h_neigh.shape, h_self.shape )
+        print("Shape", h_neigh.shape, h_self.shape, self._in_self_feats, self._out_feats, h_neigh.unsqueeze(-1).shape, h_self.unsqueeze(-1).shape )
 
         # if (h_neigh.shape != self.fc_preagg(h_neigh).shape or h_self.shape != self.fc_preagg(h_self).shape ):
         #     print(h_neigh.shape , self.fc_preagg(h_neigh).shape)
 
-        h_neigh = self.dropout_fn(self.fc_preagg(h_neigh))
-        h_self = self.dropout_fn(self.fc_preagg(h_self))
+        # h_neigh = self.dropout_fn(self.fc_preagg(h_neigh))
+        # h_self = self.dropout_fn(self.fc_preagg(h_self))
+        # h_neigh = self.dropout_fn(h_neigh.unsqueeze(-1))
+        # h_self = self.dropout_fn(h_self.unsqueeze(-1))
         # include edge weights
 
-        edge_weights = self.edge_fc(edge_features).view(-1, self._out_feats, self._out_feats)
+        graph.srcdata['h'] = self.dropout_fn(h_neigh.unsqueeze(-1))
+
+        edge_weights = self.edge_fc(edge_features).view(-1, self._in_neigh_feats, self._out_feats)
 
         # print("H neigh pre shape",h_neigh.shape)
-        # print("Edge weights", h_neigh.shape, edge_weights.shape, self.edge_fc)
+        # print("Edge weights", h_neigh.shape, edge_weights.shape, self.edge_fc(edge_features).shape)
         graph.edata['edge_weights'] = edge_weights
 
-        graph.srcdata['h'] = h_neigh
 
         if self._aggre_type == 'max':
             graph.update_all(
@@ -104,10 +107,14 @@ class ConvLayer(nn.Module):
     
         h_neigh = graph.dstdata['neigh'].sum(dim=1)
 
-        # print("Final shape", h_neigh.shape, h_self.shape, (h_neigh+h_self).shape)
+        # return h_neigh
+
+        # print("Final shape", h_neigh.shape, h_self.shape)
+        # print(self.fc_neigh(h_neigh).shape)
 
         # Experiment : can get rid of this
-        z = self.fc_self(h_self) + self.fc_neigh(h_neigh)
+        # z = self.fc_self(h_self) + self.fc_neigh(h_neigh)
+        z = self.fc_self(h_self) + h_neigh
         # z = h_neigh+h_self
 
         z = F.relu(z)
@@ -119,5 +126,6 @@ class ConvLayer(nn.Module):
         z = z / z_norm
 
         # print("H out", z.shape)
+        # print('-----------------------------------------------')
 
         return z

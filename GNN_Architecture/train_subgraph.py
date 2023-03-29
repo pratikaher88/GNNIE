@@ -32,6 +32,7 @@ print(ecommerce_hetero_graph_subgraph.ndata['features']['customer'].shape, ecomm
 dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['features'].shape[1],
             'product': ecommerce_hetero_graph_subgraph.nodes['product'].data['features'].shape[1],
             'edge_dim': ecommerce_hetero_graph_subgraph.edges['orders'].data['features'].shape[1],
+            'edge_hidden_dim': model_config['edge_hidden_dim'],
             'hidden_dim' : model_config['hidden_dim'],
             'out_dim': model_config['output_dim']
            }
@@ -86,7 +87,6 @@ with open( f'{BASE_DIR}/graph_files_subgraph/valid_eids_dict.pickle', 'wb') as f
     pickle.dump(valid_eids_dict, f, pickle.HIGHEST_PROTOCOL)
 
 # model building
-
 
 model = ConvModel(ecommerce_hetero_graph_subgraph, model_config['num_layers'], dim_dict, aggregator_type=model_config['aggregate_fn'])
 optimizer = torch.optim.Adam(model.parameters(), lr=model_config['learning_rate'],weight_decay=0)

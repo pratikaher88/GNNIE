@@ -39,7 +39,7 @@ class ConvModel(nn.Module):
         for _ in range(n_layers - 2):
             self.layers.append(
                 dglnn.HeteroGraphConv(
-                    {etype[1]: ConvLayer((dim_dict['hidden_dim'], dim_dict['hidden_dim']), dim_dict['hidden_dim'], dim_dict['edge_dim'], dropout,
+                    {etype[1]: ConvLayer((dim_dict['hidden_dim'], dim_dict['hidden_dim']), dim_dict['hidden_dim'], dim_dict['edge_dim'], dim_dict['edge_hidden_dim'], dropout,
                                             aggregator_type, norm)
                         for etype in g.canonical_etypes},
                     aggregate=aggregator_hetero))
@@ -49,7 +49,7 @@ class ConvModel(nn.Module):
         # TODO : output dimension was dim_dict['out_dim'] (instead of  dim_dict['hidden_dim']) before so I am not sure what to do 
         self.layers.append(
             dglnn.HeteroGraphConv(
-                {etype[1]: ConvLayer((dim_dict['hidden_dim'], dim_dict['hidden_dim']), dim_dict['out_dim'], dim_dict['edge_dim'], dropout,
+                {etype[1]: ConvLayer((dim_dict['hidden_dim'], dim_dict['hidden_dim']), dim_dict['out_dim'], dim_dict['edge_dim'], dim_dict['edge_hidden_dim'], dropout,
                                      aggregator_type, norm)
                  for etype in g.canonical_etypes},
                 aggregate=aggregator_hetero))
@@ -74,7 +74,7 @@ class ConvModel(nn.Module):
         
         for i in range(len(blocks)):
             layer = self.layers[i]
-            # print(f"layer {i} of {len(self.layers)}")
+            print(f"layer {i} of {len(self.layers)}")
 
             edge_features = blocks[i].edata['features']
 
