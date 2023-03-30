@@ -2,12 +2,20 @@ import dgl, torch
 import numpy as np
 from Model.model import ConvModel
 from Model.loss import max_margin_loss
-import time
-from settings import BASE_DIR, MODEL_DIR
+import time, yaml, os
+from settings import BASE_DIR, MODEL_DIR, CONFIG_PATH
 
 start = time.time()
 
-np.random.seed(111)
+np.random.seed(42)
+
+# Function to load yaml configuration file
+def load_config(config_name):
+    with open(os.path.join(f"{CONFIG_PATH}", config_name)) as file:
+        config = yaml.safe_load(file)
+    return config
+
+model_config = load_config("model_config.yml")
 
 # graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files/train_g.dgl")
 # train_g = graphs[0]
@@ -29,9 +37,11 @@ ecommerce_hetero_graph = graphs[0]
 dim_dict = {'customer': ecommerce_hetero_graph.nodes['customer'].data['features'].shape[1],
             'product': ecommerce_hetero_graph.nodes['product'].data['features'].shape[1],
             'edge_dim': ecommerce_hetero_graph.edges['orders'].data['features'].shape[1],
-            'hidden_dim' : 128,
-            'out_dim': 64
+            'edge_hidden_dim': model_config['edge_hidden_dim'],
+            'hidden_dim' : model_config['hidden_dim'],
+            'out_dim': model_config['output_dim']
            }
+
 
 # sampler = dgl.dataloading.MultiLayerFullNeighborSampler(3)
 
@@ -117,7 +127,7 @@ edge_sampler = dgl.dataloading.EdgePredictionSampler(
 # TODO : is it ecommerce_hetero_graph or train_g
 dataloader = dgl.dataloading.DataLoader(ecommerce_hetero_graph, train_eids_dict, 
                                             edge_sampler,  shuffle=True, 
-                                            batch_size=1024, num_workers=0)
+                                            batch_size=model_config['batch_size'], num_workers=0)
 
 num_batches = len(dataloader)
 print("Number of batches ",len(dataloader))
@@ -132,8 +142,9 @@ print("Number of batches ",len(dataloader))
 
 # print("reverse orders",train_g.edata)
 
-model = ConvModel(ecommerce_hetero_graph, 3, dim_dict)
-optimizer = torch.optim.Adam(model.parameters(), lr=0.0001,weight_decay=0)
+model = ConvModel(ecommerce_hetero_graph, model_config['num_layers'], dim_dict, dropout=model_config['dropout'], aggregator_type=model_config['aggregate_fn'])
+optimizer = torch.optim.Adam(model.parameters(), lr=model_config['learning_rate'],weight_decay=0)
+
 
 for i in range(10):
 

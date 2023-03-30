@@ -16,17 +16,16 @@ class NodeEmbedding(nn.Module):
 
         # self.proj_feats = nn.Sequential(
         #     nn.Linear(in_feats, out_feats),
-        #     # nn.BatchNorm1d(out_feats),
-        #     nn.Sigmoid())
+        #     nn.BatchNorm1d(out_feats),
+        #     nn.Tanh())
 
     def forward(self,
                 node_feats):
-        x = self.proj_feats(node_feats)
-        return x
+        return self.proj_feats(node_feats)
 
 class ConvModel(nn.Module):
 
-    def __init__(self, g, n_layers, dim_dict, norm: bool = True, dropout: float = 0.0, aggregator_type: str = 'mean', pred: str = 'cos_nn', aggregator_hetero: str = 'sum', embedding_layer: bool = True):
+    def __init__(self, g, n_layers, dim_dict, norm: bool = True, dropout: float = 0.0, aggregator_type: str = 'mean', pred: str = 'cos', aggregator_hetero: str = 'mean', embedding_layer: bool = True):
         
         super(ConvModel, self).__init__()
 
@@ -39,17 +38,24 @@ class ConvModel(nn.Module):
         for _ in range(n_layers - 2):
             self.layers.append(
                 dglnn.HeteroGraphConv(
-                    {etype[1]: ConvLayer((dim_dict['hidden_dim'], dim_dict['hidden_dim']), dim_dict['hidden_dim'], dim_dict['edge_dim'], dropout,
+                    {etype[1]: ConvLayer((dim_dict['hidden_dim'], dim_dict['hidden_dim']), dim_dict['hidden_dim'], dim_dict['edge_dim'], nn.Sequential(
+                                                nn.Linear(dim_dict['edge_dim'], dim_dict['edge_hidden_dim']),
+                                                nn.ReLU(),
+                                                nn.Linear(dim_dict['edge_hidden_dim'], dim_dict['hidden_dim']*dim_dict['hidden_dim'])
+                                            ), dropout,
                                             aggregator_type, norm)
                         for etype in g.canonical_etypes},
                     aggregate=aggregator_hetero))
         
         # output layer
 
-        # TODO : output dimension was dim_dict['out_dim'] (instead of  dim_dict['hidden_dim']) before so I am not sure what to do 
         self.layers.append(
             dglnn.HeteroGraphConv(
-                {etype[1]: ConvLayer((dim_dict['hidden_dim'], dim_dict['hidden_dim']), dim_dict['out_dim'], dim_dict['edge_dim'], dropout,
+                {etype[1]: ConvLayer((dim_dict['hidden_dim'], dim_dict['hidden_dim']), dim_dict['out_dim'], dim_dict['edge_dim'], nn.Sequential(
+                                                nn.Linear(dim_dict['edge_dim'], dim_dict['edge_hidden_dim']),
+                                                nn.ReLU(),
+                                                nn.Linear(dim_dict['edge_hidden_dim'], dim_dict['hidden_dim']*dim_dict['out_dim'])
+                                            ), dropout,
                                      aggregator_type, norm)
                  for etype in g.canonical_etypes},
                 aggregate=aggregator_hetero))
@@ -108,7 +114,6 @@ class ConvModel(nn.Module):
             h = self.get_repr(blocks, h, edge_features)
 
             # print("H-value", h['customer'].shape, h['product'].shape)
-
             # print("graphs", pos_g, neg_g)
 
             pos_score = self.pred_fn(pos_g, h)
