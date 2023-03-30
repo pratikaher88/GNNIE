@@ -22,12 +22,13 @@ class ConvLayer(nn.Module):
         self.fc_self = nn.Sequential(
             nn.Linear(self._in_self_feats, out_feats, bias=False),
             nn.BatchNorm1d(out_feats),
-            nn.Tanh())
+            nn.ReLU())
         
-        # self.fc_neigh = nn.Sequential(
-        #   nn.Linear(self._in_neigh_feats, out_feats, bias=False),
-        #   nn.BatchNorm1d(out_feats),
-        #   nn.Tanh())
+        # TODO : check if this is correct
+        self.fc_neigh = nn.Sequential(
+          nn.Linear(self._out_feats, out_feats, bias=False),
+          nn.BatchNorm1d(out_feats),
+          nn.ReLU())
 
         # self.fc_preagg = nn.Linear(self._in_neigh_feats, self._out_feats, bias=False)
         # self.fc_preagg = nn.Sequential(
@@ -116,7 +117,10 @@ class ConvLayer(nn.Module):
 
         # Experiment : can get rid of this
         # z = self.fc_self(h_self) + self.fc_neigh(h_neigh)
-        z = self.fc_self(h_self) + h_neigh
+
+        # print("H neigh shape", h_neigh.shape, h_self.shape, self.fc_neigh)
+
+        z = self.fc_self(h_self) + self.fc_neigh(h_neigh)
         # z = h_neigh+h_self
 
         z = F.relu(z)

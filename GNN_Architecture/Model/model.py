@@ -12,17 +12,16 @@ class NodeEmbedding(nn.Module):
                  out_feats,
                  ):
         super().__init__()
-        # self.proj_feats = nn.Linear(in_feats, out_feats)
+        self.proj_feats = nn.Linear(in_feats, out_feats)
 
-        self.proj_feats = nn.Sequential(
-            nn.Linear(in_feats, out_feats),
-            nn.BatchNorm1d(out_feats),
-            nn.Tanh())
+        # self.proj_feats = nn.Sequential(
+        #     nn.Linear(in_feats, out_feats),
+        #     nn.BatchNorm1d(out_feats),
+        #     nn.Tanh())
 
     def forward(self,
                 node_feats):
-        x = self.proj_feats(node_feats)
-        return x
+        return self.proj_feats(node_feats)
 
 class ConvModel(nn.Module):
 
@@ -50,7 +49,6 @@ class ConvModel(nn.Module):
         
         # output layer
 
-        # TODO : output dimension was dim_dict['out_dim'] (instead of  dim_dict['hidden_dim']) before so I am not sure what to do 
         self.layers.append(
             dglnn.HeteroGraphConv(
                 {etype[1]: ConvLayer((dim_dict['hidden_dim'], dim_dict['hidden_dim']), dim_dict['out_dim'], dim_dict['edge_dim'], nn.Sequential(
@@ -116,7 +114,6 @@ class ConvModel(nn.Module):
             h = self.get_repr(blocks, h, edge_features)
 
             # print("H-value", h['customer'].shape, h['product'].shape)
-
             # print("graphs", pos_g, neg_g)
 
             pos_score = self.pred_fn(pos_g, h)
