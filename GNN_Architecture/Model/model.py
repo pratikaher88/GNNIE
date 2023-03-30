@@ -16,8 +16,8 @@ class NodeEmbedding(nn.Module):
 
         # self.proj_feats = nn.Sequential(
         #     nn.Linear(in_feats, out_feats),
-        #     # nn.BatchNorm1d(out_feats),
-        #     nn.Sigmoid())
+        #     nn.BatchNorm1d(out_feats),
+        #     nn.Tanh())
 
     def forward(self,
                 node_feats):
@@ -26,7 +26,7 @@ class NodeEmbedding(nn.Module):
 
 class ConvModel(nn.Module):
 
-    def __init__(self, g, n_layers, dim_dict, norm: bool = True, dropout: float = 0.0, aggregator_type: str = 'mean', pred: str = 'cos', aggregator_hetero: str = 'sum', embedding_layer: bool = True):
+    def __init__(self, g, n_layers, dim_dict, norm: bool = True, dropout: float = 0.0, aggregator_type: str = 'mean', pred: str = 'cos', aggregator_hetero: str = 'mean', embedding_layer: bool = True):
         
         super(ConvModel, self).__init__()
 

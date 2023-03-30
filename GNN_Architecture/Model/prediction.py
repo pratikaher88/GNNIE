@@ -73,7 +73,7 @@ class PredictingModule(nn.Module):
 
     def __init__(self,embed_dim: int):
         super(PredictingModule, self).__init__()
-        self.layer_nn = Cosine_PredictingLayer(embed_dim)
+        self.layer_nn = PredictingLayer(embed_dim)
 
     def forward(self,
                 graph,

@@ -36,7 +36,7 @@ dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['
 
 saved_model = torch.load(f"{BASE_DIR}/graph_files_subgraph/trained_model.pth")
 
-mpnn_model = ConvModel(ecommerce_hetero_graph_subgraph, model_config['num_layers'], dim_dict)
+mpnn_model = ConvModel(ecommerce_hetero_graph_subgraph, model_config['num_layers'], dim_dict, aggregator_type=model_config['aggregate_fn'], pred=model_config['pred'])
 mpnn_model.load_state_dict(saved_model['model_state_dict'])
 mpnn_model.eval()
 
@@ -115,7 +115,7 @@ for arg0 , pos_g, neg_g, blocks in valid_dataloader:
 
     print("Output features shape", h['customer'].shape, h['product'].shape)
     for ntype in h.keys():
-        train_embeddings[ntype][output_nodes[ntype]] = h[ntype]
+        train_embeddings[ntype][output_nodes[ntype]] = h[ntype].detach()
 
 print(train_embeddings['customer'][1].shape, train_embeddings['customer'].shape, train_embeddings['product'].shape)
 
@@ -177,7 +177,7 @@ def compare_rec(ground_truth_recs, model_recs, threshold = 10):
   return correct, total
 
 
-print(compare_rec(recommendations_from_valid_graph, model_recommendations))
+# print(compare_rec(recommendations_from_valid_graph, model_recommendations))
 random_model = baseline_model_generator.generate_random_model(ecommerce_hetero_graph_subgraph, 'customer', 'product')
 baseline_model = baseline_model_generator.generate_popularity_model(ecommerce_hetero_graph_subgraph, 'orders', 'customer')
 

@@ -29,7 +29,7 @@ ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'o
 
 print(ecommerce_hetero_graph_subgraph)
 
-print("Input nodes shape : ",ecommerce_hetero_graph_subgraph.ndata['features']['customer'].shape, ecommerce_hetero_graph_subgraph.ndata['features']['product'].shape)
+print("Input nodes shape : ", ecommerce_hetero_graph_subgraph.ndata['features']['customer'].shape, ecommerce_hetero_graph_subgraph.ndata['features']['product'].shape)
 
 dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['features'].shape[1],
             'product': ecommerce_hetero_graph_subgraph.nodes['product'].data['features'].shape[1],
@@ -74,7 +74,6 @@ dataloader = dgl.dataloading.DataLoader(ecommerce_hetero_graph_subgraph, train_e
 
 num_batches = len(dataloader)
 print("Number of batches ",len(dataloader))
-
 
 # print(train_g.edata['features'])
 # save down graphs
