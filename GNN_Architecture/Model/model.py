@@ -12,12 +12,12 @@ class NodeEmbedding(nn.Module):
                  out_feats,
                  ):
         super().__init__()
-        self.proj_feats = nn.Linear(in_feats, out_feats)
+        # self.proj_feats = nn.Linear(in_feats, out_feats)
 
-        # self.proj_feats = nn.Sequential(
-        #     nn.Linear(in_feats, out_feats),
-        #     nn.BatchNorm1d(out_feats),
-        #     nn.Tanh())
+        self.proj_feats = nn.Sequential(
+            nn.Linear(in_feats, out_feats),
+            nn.BatchNorm1d(out_feats),
+            nn.Tanh())
 
     def forward(self,
                 node_feats):
