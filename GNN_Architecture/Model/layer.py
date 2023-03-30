@@ -6,14 +6,14 @@ import torch
 # TO DO : not sure how this architecture will affect things
 class ConvLayer(nn.Module):
 
-    def __init__(self, in_feats, out_feats, edge_dim, edge_hidden_dim,dropout, aggregator_type, norm):
+    def __init__(self, in_feats, out_feats, edge_dim, edge_fc, dropout, aggregator_type, norm):
 
         super().__init__()
 
         self._in_neigh_feats, self._in_self_feats = in_feats
         self._out_feats = out_feats
         self._aggre_type = aggregator_type
-        self._edge_hidden_dim = edge_hidden_dim
+        # self._edge_hidden_dim = edge_hidden_dim
         self.norm = norm
         self.dropout_fn = nn.Dropout(dropout)
         # self.fc_self = nn.Linear(self._out_feats, out_feats, bias=False)
@@ -24,10 +24,10 @@ class ConvLayer(nn.Module):
             nn.BatchNorm1d(out_feats),
             nn.Tanh())
         
-        self.fc_neigh = nn.Sequential(
-          nn.Linear(self._in_neigh_feats, out_feats, bias=False),
-          nn.BatchNorm1d(out_feats),
-          nn.Tanh())
+        # self.fc_neigh = nn.Sequential(
+        #   nn.Linear(self._in_neigh_feats, out_feats, bias=False),
+        #   nn.BatchNorm1d(out_feats),
+        #   nn.Tanh())
 
         # self.fc_preagg = nn.Linear(self._in_neigh_feats, self._out_feats, bias=False)
         # self.fc_preagg = nn.Sequential(
@@ -41,11 +41,13 @@ class ConvLayer(nn.Module):
         # nn.Tanh(),
         # )
 
-        self.edge_fc = nn.Sequential(
-            nn.Linear(edge_dim, self._edge_hidden_dim),
-            nn.ReLU(),
-            nn.Linear(self._edge_hidden_dim, self._in_neigh_feats*self._out_feats)
-        )
+        # self.edge_fc = nn.Sequential(
+        #     nn.Linear(edge_dim, 128),
+        #     nn.ReLU(),
+        #     nn.Linear(128, self._in_neigh_feats*self._out_feats)
+        # )
+
+        self.edge_fc = edge_fc
 
         # self.edge_fc = nn.Linear(edge_dim, self._out_feats*self._out_feats)
         self.edge_dim = edge_dim
@@ -54,7 +56,7 @@ class ConvLayer(nn.Module):
     def reset_parameters(self):
         gain = nn.init.calculate_gain('relu')
         nn.init.xavier_uniform_(self.fc_self[0].weight, gain=gain)
-        nn.init.xavier_uniform_(self.fc_neigh[0].weight, gain=gain)
+        # nn.init.xavier_uniform_(self.fc_neigh[0].weight, gain=gain)
         # nn.init.xavier_uniform_(self.fc_preagg[0].weight, gain=gain)
         nn.init.xavier_uniform_(self.edge_fc[0].weight, gain=gain)
 

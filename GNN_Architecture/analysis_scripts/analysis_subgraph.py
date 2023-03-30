@@ -186,16 +186,26 @@ for key, value in recommendations_from_valid_graph.items():
     HM[key] = list(set(value))
 
 # print(HM[446])
-print(model_recommendations[446][:20], len(model_recommendations[446]))
+# print(model_recommendations[446][:20], len(model_recommendations[446]))
 # print(model_recommendations[0][:20], len(model_recommendations[0]))
 # print(model_recommendations)
-print(baseline_model[446][:20], len(baseline_model[446]))
+# print(baseline_model[446][:20], len(baseline_model[446]))
 
 
 
-from evaluation.evaluation_metrics import mmr,hit_rate_accuracy
+from evaluation.evaluation_metrics import mmr,hit_rate_accuracy, hit_rate_recall
 
-print("MMR GNN Model: ", hit_rate_accuracy(HM, model_recommendations, 40))
-print("MMR Random Model: ", hit_rate_accuracy(HM, random_model, 40))
-print("MMR Popularity Model: ", hit_rate_accuracy(HM, baseline_model, 40))
+print("Precision GNN Model: ", hit_rate_accuracy(HM, model_recommendations, 40))
+print("Precision Random Model: ", hit_rate_accuracy(HM, random_model, 40))
+print("Precision Popularity Model: ", hit_rate_accuracy(HM, baseline_model, 40))
+
+print('------------------')
+
+print("Recall GNN Model: ", round(hit_rate_recall(HM, model_recommendations, 40), 5))
+print("Recall Random Model: ", round(hit_rate_recall(HM, random_model, 40), 5))
+print("Recall Popularity Model: ", round(hit_rate_recall(HM, baseline_model, 40), 5))
+
+# print("MMR GNN Model: ", mmr(HM, model_recommendations, 30))
+# print("MMR Random Model: ", mmr(HM, random_model, 30))
+# print("MMR Popularity Model: ", mmr(HM, baseline_model, 30))
 

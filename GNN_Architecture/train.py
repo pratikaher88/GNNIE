@@ -142,7 +142,7 @@ print("Number of batches ",len(dataloader))
 
 # print("reverse orders",train_g.edata)
 
-model = ConvModel(ecommerce_hetero_graph, model_config['num_layers'], dim_dict, aggregator_type=model_config['aggregate_fn'])
+model = ConvModel(ecommerce_hetero_graph, model_config['num_layers'], dim_dict, dropout=model_config['dropout'], aggregator_type=model_config['aggregate_fn'])
 optimizer = torch.optim.Adam(model.parameters(), lr=model_config['learning_rate'],weight_decay=0)
 
 

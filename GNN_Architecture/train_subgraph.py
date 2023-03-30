@@ -15,19 +15,21 @@ model_config = load_config("model_config.yml")
 
 np.random.seed(42)
 
+number_of_egdes = model_config['number_of_egdes']
+
 graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_vmcloud/ecommerce_hetero_graph.dgl")
 ecommerce_hetero_graph = graphs[0]
 
 # subgraph
 # ecommerce_hetero_graph_subgraph = ecommerce_hetero_graph.subgraph({ 'customer' :list(range(1000)), 'product': list(range(ecommerce_hetero_graph.num_nodes('product')))})
 
-ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : list(range(5000)), 'rev-orders' : list(range(5000)) } )
+ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : list(range(number_of_egdes)), 'rev-orders' : list(range(number_of_egdes)) } )
 
 # ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : [random.randint(1, 10000) for i in range(1000)], 'rev-orders' : [random.randint(1, 10000) for i in range(1000)] } )
 
 print(ecommerce_hetero_graph_subgraph)
 
-print(ecommerce_hetero_graph_subgraph.ndata['features']['customer'].shape, ecommerce_hetero_graph_subgraph.ndata['features']['product'].shape)
+print("Input nodes shape : ",ecommerce_hetero_graph_subgraph.ndata['features']['customer'].shape, ecommerce_hetero_graph_subgraph.ndata['features']['product'].shape)
 
 dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['features'].shape[1],
             'product': ecommerce_hetero_graph_subgraph.nodes['product'].data['features'].shape[1],
@@ -68,7 +70,7 @@ edge_sampler = dgl.dataloading.EdgePredictionSampler(
 
 dataloader = dgl.dataloading.DataLoader(ecommerce_hetero_graph_subgraph, train_eids_dict, 
                                             edge_sampler,  shuffle=True, 
-                                            batch_size=model_config['batch_size'], num_workers=0)
+                                            batch_size=model_config['batch_size'], num_workers=model_config['num_workers'])
 
 num_batches = len(dataloader)
 print("Number of batches ",len(dataloader))
@@ -83,12 +85,12 @@ dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/valid_g.dgl", [valid_g])
 dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/test_g.dgl", [test_g])
 dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/ecommerce_hetero_graph_subgraph.dgl", [ecommerce_hetero_graph_subgraph])
 
-with open( f'{BASE_DIR}/graph_files_subgraph/valid_eids_dict.pickle', 'wb') as f:
-    pickle.dump(valid_eids_dict, f, pickle.HIGHEST_PROTOCOL)
+# with open( f'{BASE_DIR}/graph_files_subgraph/valid_eids_dict.pickle', 'wb') as f:
+#     pickle.dump(valid_eids_dict, f, pickle.HIGHEST_PROTOCOL)
 
 # model building
 
-model = ConvModel(ecommerce_hetero_graph_subgraph, model_config['num_layers'], dim_dict, aggregator_type=model_config['aggregate_fn'])
+model = ConvModel(ecommerce_hetero_graph_subgraph, model_config['num_layers'], dim_dict, aggregator_type=model_config['aggregate_fn'], pred=model_config['pred'])
 optimizer = torch.optim.Adam(model.parameters(), lr=model_config['learning_rate'],weight_decay=0)
 
 for i in range(10):
@@ -101,7 +103,6 @@ for i in range(10):
         optimizer.zero_grad()
 
         input_features = blocks[0].srcdata['features']
-
         edge_features = blocks[0].edata['features']
 
         HM = {}
@@ -126,7 +127,7 @@ for i in range(10):
 
         batch += 1
 
-        print(f'batch: {batch} of {num_batches}')
+        # print(f'batch: {batch} of {num_batches}')
     
     print(f'Total loss at epoch {i} :',total_loss)
 
