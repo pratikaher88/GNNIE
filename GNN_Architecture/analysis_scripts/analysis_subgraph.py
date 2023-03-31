@@ -119,6 +119,11 @@ for arg0 , pos_g, neg_g, blocks in valid_dataloader:
     
     print(f'batch: {batch} of {num_batches}')
 
+
+import pickle
+with open( f'{BASE_DIR}/graph_files_full/trained_embeddings.pickle', 'wb') as f:
+    pickle.dump(train_embeddings, f, pickle.HIGHEST_PROTOCOL)
+
 print(train_embeddings['customer'][1].shape, train_embeddings['customer'].shape, train_embeddings['product'].shape)
 
 print('zeros count : ', (train_embeddings['product'][5].shape[0] - torch.count_nonzero(train_embeddings['product'][5])).item(), "out of",train_embeddings['product'][5].shape[0])
