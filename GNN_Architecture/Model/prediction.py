@@ -7,7 +7,6 @@ import dgl.function as fn
 class CosinePrediction(nn.Module):
     """
     Scoring function that uses cosine similarity to compute similarity between user and item.
-
     Only used if fixed_params.pred == 'cos'.
     """
 
@@ -15,7 +14,6 @@ class CosinePrediction(nn.Module):
         super().__init__()
 
     def forward(self, graph, h):
-
         # print("input graph :", graph)
         with graph.local_scope():
             for etype in graph.canonical_etypes:
@@ -114,7 +112,7 @@ class Cosine_PredictingLayer(nn.Module):
 
     def __init__(self, embed_dim: int):
         super(Cosine_PredictingLayer, self).__init__()
-        self.hidden_1 = nn.Linear((embed_dim * 2) + 1, 128)
+        self.hidden_1 = nn.Linear((embed_dim * 2)+1, 128)
         self.hidden_2 = nn.Linear(128, 32)
         self.output = nn.Linear(32, 1)
         self.relu = nn.ReLU()
