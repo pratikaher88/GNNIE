@@ -3,6 +3,7 @@ import torch
 import pandas as pd
 import numpy as np
 from settings import BASE_DIR
+from validate_graph import validate_customer_features, validate_product_features, validate_edges
 
 BASE_DIR_ARCHIVE = '/Users/pratikaher/SPRING23/Capstone/DatasetEDA/archive'
 
@@ -167,6 +168,12 @@ edge_features = df_final['is_reviewed'].tolist()
 ecommerce_hetero_graph.edges['orders'].data['features']= torch.tensor(edge_features).unsqueeze(-1)
 ecommerce_hetero_graph.edges['rev-orders'].data['features']= torch.tensor(edge_features).unsqueeze(-1)
 
+# run validation scripts
+# TODO: error handling in case validation scripts return errors
+print(validate_customer_features(ecommerce_hetero_graph, df_final))
+print(validate_product_features(ecommerce_hetero_graph, df_final))
+print(validate_edges(ecommerce_hetero_graph, df_final, 'orders', 'customer_id_int', 'product_id_int'))
+print(validate_edges(ecommerce_hetero_graph, df_final, 'rev-orders', 'product_id_int', 'customer_id_int'))
 
 print("SAVE GRAPH !!")
 dgl.save_graphs(f"{BASE_DIR}/created_graphs/ecommerce_hetero_graph.dgl", [ecommerce_hetero_graph])
