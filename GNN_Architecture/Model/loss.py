@@ -6,7 +6,7 @@ import torch.nn.functional as F
 def max_margin_loss(pos_score, neg_score, delta=0.5):
 
     all_scores = torch.empty(0)
-
+    
     for etype in pos_score.keys():
         neg_score_tensor = neg_score[etype]
         pos_score_tensor = pos_score[etype]
