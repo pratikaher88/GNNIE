@@ -70,14 +70,24 @@ Returns: dictionary
 DGL Heterograph"""
 def generate_random_model(graph, user_node_label, product_node_label):
 
-    # orders = np.array(graph.nodes[product_node_label].data['_ID'].tolist())
+    """
     orders = np.array(graph.nodes(product_node_label))
     customers_list = np.array(graph.nodes(user_node_label))
-    # customers_list = graph.nodes[user_node_label].data['_ID'].tolist()
     random_model = {}
 
     for customer in customers_list:
         np.random.shuffle(orders)
         random_model[customer] = np.array(orders)
+
+    return random_model
+    """
+    orders = np.array(graph.nodes(product_node_label))
+    np.random.shuffle(orders)
+ 
+    customers_list = np.array(graph.nodes(user_node_label))
+    random_model = {}
+
+    for customer in customers_list:
+        random_model[customer] = orders
 
     return random_model

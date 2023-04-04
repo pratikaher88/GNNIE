@@ -30,14 +30,14 @@ Returns: float
 -------
 DGL Heterograph"""
     
-def hit_rate_accuracy(test_recs, recommendations, K):
+def hit_rate_accuracy(test_recs, recommendations, num_recs):
     
-    if(K==0): 
+    if(num_recs==0): 
         return 0
     hits, total = 0, 0
     for k, v in test_recs.items():
-        hits += sum(edge in v for edge in recommendations.get(k)[:K])
-        total = total + K
+        hits += sum(edge in v for edge in recommendations.get(k)[:num_recs])
+        total = total + num_recs
     
     return hits/total
 
@@ -52,6 +52,13 @@ def hit_rate_recall(test_recs, recommendations, num_recs):
 
     return hits/total
 
+def hr_auc_rr(test_recs, recommendations, thresholds):
+    
+    auc = 0
+    for t in thresholds:
+        hit_rate_precision
+        auc += hit_rate_precision(test_recs, recommendations, t)*hit_rate_recall(test_recs, recommendations, t)
+    return auc
 
 
 """
@@ -85,7 +92,7 @@ def mmr(test_recs, recommendations, scaling_factor = 1):
             if product in recommendations.get(user):
                 rec_rank = 1/((recommendations.get(user).tolist().index(product)+1)/scaling_factor)
             else:
-                rec_rank = 1/(len(recommendations.get(user))+1)
+                rec_rank = 1/(recommendations.get(user).size+1)
             agg_rec_rank += rec_rank
             total += 1
 
