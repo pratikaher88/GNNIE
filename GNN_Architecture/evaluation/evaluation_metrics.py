@@ -1,8 +1,14 @@
+# %load evaluation_metrics.py
 #!/usr/bin/env python
-# coding: utf-8
+
+# In[6]:
+
 
 import numpy as np
 from collections import defaultdict
+
+
+# In[14]:
 
 
 """
@@ -29,8 +35,9 @@ Returns: float
     Hit Rate Score
 -------
 DGL Heterograph"""
-    
-def hit_rate_accuracy(test_recs, recommendations, K):
+
+#¿How many recommendations are being purchased by users?
+def hit_rate_precision(test_recs, recommendations, K):
     
     if(K==0): 
         return 0
@@ -41,16 +48,25 @@ def hit_rate_accuracy(test_recs, recommendations, K):
     
     return hits/total
 
-def hit_rate_recall(test_recs, recommendations, num_recs):
+#¿How many purchases from our users are being recommended?
+def hit_rate_recall(test_recs, recommendations, K):
     
-    if(num_recs==0): 
+    if(K==0): 
         return 0
     hits, total = 0, 0
     for k, v in test_recs.items():
-        hits += sum(edge in v for edge in recommendations.get(k)[:num_recs])
+        hits += sum(edge in v for edge in recommendations.get(k)[:K])
         total += len(v)
 
     return hits/total
+
+def hr_auc_rr(test_recs, recommendations, thresholds):
+    
+    auc = 0
+    for t in thresholds:
+        hit_rate_precision
+        auc += hit_rate_precision(test_recs, recommendations, t)*hit_rate_recall(test_recs, recommendations, t)
+    return auc
 
 
 
@@ -85,10 +101,10 @@ def mmr(test_recs, recommendations, scaling_factor = 1):
             if product in recommendations.get(user):
                 rec_rank = 1/((recommendations.get(user).tolist().index(product)+1)/scaling_factor)
             else:
-                rec_rank = 1/(len(recommendations.get(user))+1)
+                rec_rank = 1/(recommendations.get(user).size+1)
             agg_rec_rank += rec_rank
             total += 1
 
     return agg_rec_rank/total
-    
+
 
