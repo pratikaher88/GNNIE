@@ -155,8 +155,11 @@ def _process_product_features(df_final):
 
     HM = {}
     for _, row in df_final.iterrows():
-        HM[row['product_id_int']] = torch.tensor([round(row['price'], 4), row['purchase_weekofyear']])
+        # HM[row['product_id_int']] = torch.tensor([round(row['price'], 4), row['purchase_weekofyear']])
+        HM[row['product_id_int']] = torch.tensor([row['product_weight_g'], row['product_photos_qty']])
     return HM
+
+# print(df_final.columns)
 
 prodid_to_feat = _process_product_features(df_final)
 
@@ -164,7 +167,8 @@ product_features = [value[1] for value in list(prodid_to_feat.items())]
 ecommerce_hetero_graph.nodes['product'].data['features'] = torch.stack(product_features, axis=0)    
 
 # edge feature assignment
-edge_features = df_final['is_reviewed'].tolist()
+edge_features = [[float(x), float(y)] for x, y in zip(df_final['price'], df_final['purchase_weekofyear'])]
+print(edge_features[:5])
 ecommerce_hetero_graph.edges['orders'].data['features']= torch.tensor(edge_features).unsqueeze(-1)
 ecommerce_hetero_graph.edges['rev-orders'].data['features']= torch.tensor(edge_features).unsqueeze(-1)
 
