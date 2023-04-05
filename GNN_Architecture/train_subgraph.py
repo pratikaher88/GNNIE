@@ -15,20 +15,20 @@ model_config = load_config("model_config.yml")
 
 np.random.seed(42)
 
-number_of_egdes = model_config['number_of_egdes']
-
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_vmcloud/ecommerce_hetero_graph.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/ecommerce_hetero_graph.dgl")
 ecommerce_hetero_graph = graphs[0]
 
 # subgraph
 # ecommerce_hetero_graph_subgraph = ecommerce_hetero_graph.subgraph({ 'customer' :list(range(1000)), 'product': list(range(ecommerce_hetero_graph.num_nodes('product')))})
 
-# ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : list(range(number_of_egdes)), 'rev-orders' : list(range(number_of_egdes)) } )
+if model_config['train_full'] == True:
+    ecommerce_hetero_graph_subgraph = ecommerce_hetero_graph
+else:
+    number_of_egdes = model_config['number_of_egdes']
+    ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : list(range(number_of_egdes)), 'rev-orders' : list(range(number_of_egdes)) } )
+    # ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : [random.randint(1, 10000) for i in range(1000)], 'rev-orders' : [random.randint(1, 10000) for i in range(1000)] } )
 
-# ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : [random.randint(1, 10000) for i in range(1000)], 'rev-orders' : [random.randint(1, 10000) for i in range(1000)] } )
-
-ecommerce_hetero_graph_subgraph = ecommerce_hetero_graph
-print(ecommerce_hetero_graph_subgraph)
+print("Training Graph: ",ecommerce_hetero_graph_subgraph)
 
 print("Input nodes shape : ", ecommerce_hetero_graph_subgraph.ndata['features']['customer'].shape, ecommerce_hetero_graph_subgraph.ndata['features']['product'].shape)
 

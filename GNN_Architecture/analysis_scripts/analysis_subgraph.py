@@ -39,6 +39,8 @@ mpnn_model = ConvModel(ecommerce_hetero_graph_subgraph, model_config['num_layers
 mpnn_model.load_state_dict(saved_model['model_state_dict'])
 mpnn_model.eval()
 
+# print("Validating model", valid_g)
+
 from collections import defaultdict
 
 # for test, get ground truth entites (entites that users will request in the future)
@@ -121,7 +123,7 @@ for arg0 , pos_g, neg_g, blocks in valid_dataloader:
 
 
 import pickle
-with open( f'{BASE_DIR}/graph_files_full/trained_embeddings.pickle', 'wb') as f:
+with open( f'{BASE_DIR}/graph_files_subgraph/trained_embeddings.pickle', 'wb') as f:
     pickle.dump(train_embeddings, f, pickle.HIGHEST_PROTOCOL)
 
 print(train_embeddings['customer'][1].shape, train_embeddings['customer'].shape, train_embeddings['product'].shape)
