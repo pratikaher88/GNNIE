@@ -109,4 +109,20 @@ def validate_edges(clean_graph, df, etype, src_col_name, dest_col_name):
 
 # TODO: once we decide edge features, validate edge features
 def validate_edge_features(clean_graph, df, etype, src_col_name, dest_col_name):
-    return True
+    prod_ids_from_graph_tensor = clean_graph.nodes('customer')
+    prod_ids_from_graph = [id.item() for id in prod_ids_from_graph_tensor]
+    edge_id_dict = {}
+    edge_feat_dict = {}
+    for node_id in prod_ids_from_graph:
+        output = clean_graph.out_edges(node_id, etype='orders', form='all')
+        print("u", output[0].item())
+        print("v", output[1].item())
+        print("edge ID", output[2].item())
+        u = output[0].item()
+        v = output[1].item()
+        edge_id = output[2].item()
+        edge_feat_dict[(u,v)] = edge_id
+
+    edge_feats = clean_graph.edges['orders'].data['features'].tolist()
+    for i in edge_feats:
+        edge_feat_dict[i]
