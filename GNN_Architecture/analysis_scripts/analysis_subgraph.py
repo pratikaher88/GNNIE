@@ -12,9 +12,11 @@ def load_config(config_name):
         config = yaml.safe_load(file)
     return config
 
+print("Loading model config")
 model_config = load_config("model_config.yml")
 
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/ecommerce_hetero_graph_subgraph.dgl")
+graph_name = model_config['input_graph_name']
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/{graph_name}")
 ecommerce_hetero_graph_subgraph = graphs[0]
 
 graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/train_g.dgl")
@@ -39,7 +41,7 @@ mpnn_model = ConvModel(ecommerce_hetero_graph_subgraph, model_config['num_layers
 mpnn_model.load_state_dict(saved_model['model_state_dict'])
 mpnn_model.eval()
 
-# print("Validating model", valid_g)
+print("Validating model", valid_g)
 
 from collections import defaultdict
 
