@@ -1,9 +1,11 @@
 import dgl, torch, pickle
 import numpy as np
-import os, random, yaml
+import os, random, yaml, time
 from Model.model import ConvModel
 from Model.loss import max_margin_loss, binary_cross_entropy_loss
 from settings import BASE_DIR, CONFIG_PATH
+
+start = time.time()
 
 # Function to load yaml configuration file
 def load_config(config_name):
@@ -15,20 +17,22 @@ model_config = load_config("model_config.yml")
 
 np.random.seed(42)
 
-number_of_egdes = model_config['number_of_egdes']
+graph_name = model_config['input_graph_name']
 
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_vmcloud/ecommerce_hetero_graph.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/{graph_name}")
 ecommerce_hetero_graph = graphs[0]
 
 # subgraph
 # ecommerce_hetero_graph_subgraph = ecommerce_hetero_graph.subgraph({ 'customer' :list(range(1000)), 'product': list(range(ecommerce_hetero_graph.num_nodes('product')))})
 
-# ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : list(range(number_of_egdes)), 'rev-orders' : list(range(number_of_egdes)) } )
+if model_config['train_full'] == True:
+    ecommerce_hetero_graph_subgraph = ecommerce_hetero_graph
+else:
+    number_of_egdes = model_config['number_of_egdes']
+    ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : list(range(number_of_egdes)), 'rev-orders' : list(range(number_of_egdes)) } )
+    # ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : [random.randint(1, 10000) for i in range(1000)], 'rev-orders' : [random.randint(1, 10000) for i in range(1000)] } )
 
-# ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : [random.randint(1, 10000) for i in range(1000)], 'rev-orders' : [random.randint(1, 10000) for i in range(1000)] } )
-
-ecommerce_hetero_graph_subgraph = ecommerce_hetero_graph
-print(ecommerce_hetero_graph_subgraph)
+print("Training Graph: ",ecommerce_hetero_graph_subgraph)
 
 print("Input nodes shape : ", ecommerce_hetero_graph_subgraph.ndata['features']['customer'].shape, ecommerce_hetero_graph_subgraph.ndata['features']['product'].shape)
 
@@ -140,3 +144,6 @@ torch.save({'epoch': i,
         f'{BASE_DIR}/graph_files_subgraph/trained_model.pth')
 
 print("Training complete: saved model to :", f'{BASE_DIR}/graph_files_subgraph/trained_model.pth')
+
+
+print(time.time() - start)

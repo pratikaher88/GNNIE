@@ -18,6 +18,7 @@ class ConvLayer(nn.Module):
         self.dropout_fn = nn.Dropout(dropout)
         # self.fc_self = nn.Linear(self._out_feats, out_feats, bias=False)
         # self.fc_neigh = nn.Linear(self._out_feats, out_feats, bias=False)
+        self.lstm = nn.LSTM(self._out_feats*self._out_feats, self._out_feats*self._out_feats, batch_first=True)
 
         self.fc_self = nn.Sequential(
             nn.Linear(self._in_self_feats, out_feats, bias=False),
@@ -61,6 +62,52 @@ class ConvLayer(nn.Module):
         # nn.init.xavier_uniform_(self.fc_preagg[0].weight, gain=gain)
         nn.init.xavier_uniform_(self.edge_fc[0].weight, gain=gain)
 
+    def flatten_last_two_dims(self, x):
+        # Get the shape of the input tensor
+        shape = x.shape
+        
+        # Determine the size of the flattened dimension
+        flattened_size = x.shape[-2] * x.shape[-1]
+        
+        # Reshape the tensor to have shape (..., flattened_size)
+        x = x.view(*shape[:-2], flattened_size)
+        
+        # Return the flattened tensor
+        return x
+
+
+    def _lstm_reducer(self, nodes):
+
+        m = nodes.mailbox['m']
+        # print(m.shape, torch.mean(nodes.mailbox['m'], dim=1).shape)
+
+        # return {'neigh': torch.mean(nodes.mailbox['m'], dim=1)}
+    
+        # m = torch.squeeze(m, 1)
+        # m = m[:, 0, :, :]
+        # m = m.mean(1, keepdim=True)
+        # m = torch.squeeze(m, 1)
+
+        print(m.shape)
+
+        m = self.flatten_last_two_dims(m)
+
+        print(m.shape)
+
+
+        batch_size = m.shape[0]
+        h = (m.new_zeros((1, batch_size, self._out_feats*self._out_feats)),
+             m.new_zeros((1, batch_size, self._out_feats*self._out_feats)))
+        
+        print(m.shape, h[0].shape, h[1].shape)
+        output, (rst, _) = self.lstm(m, h)
+
+        batch_size, channels, wh = rst.size()
+        rst = rst.view(batch_size, channels, self._out_feats, self._out_feats)
+        print(rst.shape, output.shape)
+        return {'neigh': rst[:, 0, :, :]}
+        # return {'neigh': rst.reshape(-1, 1, self._out_feats, self._out_feats)[:, 0, :, :]}
+
     def forward(self, graph, x, edge_features):
         
         # print('------------')
@@ -83,7 +130,7 @@ class ConvLayer(nn.Module):
 
         edge_weights = self.edge_fc(edge_features).view(-1, self._in_neigh_feats, self._out_feats)
 
-        # print("H neigh pre shape",h_neigh.shape)
+        # print("H neigh pre shape", graph.srcdata['h'].shape, edge_weights.shape)
         # print("Edge weights", h_neigh.shape, edge_weights.shape, self.edge_fc(edge_features).shape)
         graph.edata['edge_weights'] = edge_weights
 
@@ -103,6 +150,12 @@ class ConvLayer(nn.Module):
             graph.update_all(
                 fn.u_mul_e('h', 'edge_weights', 'm'),
                 fn.mean('m', 'neigh'))
+        
+        elif self._aggre_type == 'lstm':
+
+             graph.update_all(
+                fn.u_mul_e('h', 'edge_weights', 'm'),
+                self._lstm_reducer)
             
         # graph.update_all(
         #     fn.copy_src('h', 'm'),

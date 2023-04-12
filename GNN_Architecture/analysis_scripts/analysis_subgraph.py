@@ -12,9 +12,11 @@ def load_config(config_name):
         config = yaml.safe_load(file)
     return config
 
+print("Loading model config")
 model_config = load_config("model_config.yml")
 
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/ecommerce_hetero_graph_subgraph.dgl")
+graph_name = model_config['input_graph_name']
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/{graph_name}")
 ecommerce_hetero_graph_subgraph = graphs[0]
 
 graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/train_g.dgl")
@@ -38,6 +40,8 @@ saved_model = torch.load(f"{BASE_DIR}/graph_files_subgraph/trained_model.pth")
 mpnn_model = ConvModel(ecommerce_hetero_graph_subgraph, model_config['num_layers'], dim_dict, aggregator_type=model_config['aggregate_fn'], pred=model_config['pred'])
 mpnn_model.load_state_dict(saved_model['model_state_dict'])
 mpnn_model.eval()
+
+print("Validating model", valid_g)
 
 from collections import defaultdict
 
@@ -121,7 +125,7 @@ for arg0 , pos_g, neg_g, blocks in valid_dataloader:
 
 
 import pickle
-with open( f'{BASE_DIR}/graph_files_full/trained_embeddings.pickle', 'wb') as f:
+with open( f'{BASE_DIR}/graph_files_subgraph/trained_embeddings.pickle', 'wb') as f:
     pickle.dump(train_embeddings, f, pickle.HIGHEST_PROTOCOL)
 
 print(train_embeddings['customer'][1].shape, train_embeddings['customer'].shape, train_embeddings['product'].shape)
