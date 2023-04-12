@@ -1,5 +1,6 @@
 input_graph_name: ecommerce_hetero_graph_with_sf.dgl
 aggregate_fn: mean
+n_epochs: 10
 batch_size: 512
 hidden_dim: 128
 edge_hidden_dim: 64
