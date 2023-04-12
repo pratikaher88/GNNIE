@@ -3,6 +3,7 @@
 
 import numpy as np
 from collections import defaultdict
+import math
 
 
 """
@@ -30,7 +31,7 @@ Returns: float
 -------
 DGL Heterograph"""
     
-def hit_rate_accuracy(test_recs, recommendations, num_recs):
+def hit_rate_precision(test_recs, recommendations, num_recs):
     
     if(num_recs==0): 
         return 0
@@ -97,5 +98,74 @@ def mmr(test_recs, recommendations, scaling_factor = 1):
             total += 1
 
     return agg_rec_rank/total
+
+
+
+
+""" 
+Takes values of p and d
+----------
+p : Weight parameter, giving the influence of the first d
+    elements on the final score. p<0<1.
+d : depth at which the weight has to be calculated
     
+Returns
+-------
+Float of Weightage Wrbo at depth d
+"""
+def weightage_calculator(p,d):
+
+
+    summation_term = 0
+
+    for i in range (1, d): # taking d here will loop upto the value d-1 
+        summation_term = summation_term + math.pow(p,i)/i
+
+
+    Wrbo_1_d = 1 - math.pow(p, d-1) + (((1-p)/p) * d *(np.log(1/(1-p)) - summation_term))
+
+    return Wrbo_1_d
+
+
+""" Takes two lists S and T of any lengths and gives out the RBO Score
+Parameters
+----------
+S, T : Lists (str, integers)
+p : Weight parameter, giving the influence of the first d
+    elements on the final score. p<0<1. Default 0.9 give the top 10 
+    elements 86% of the contribution in the final score.
+    
+Returns
+-------
+Float of RBO score
+"""
+    
+def rbo(S,T, p= 0.9):
+
+    # Fixed Terms
+    k = max(len(S), len(T))
+    x_k = len(set(S).intersection(set(T)))
+    
+    summation_term = 0
+
+    # Loop for summation
+    # k+1 for the loop to reach the last element (at k) in the bigger list    
+    for d in range (1, k+1): 
+        # Create sets from the lists
+        set1 = set(S[:d]) if d < len(S) else set(S)
+        set2 = set(T[:d]) if d < len(T) else set(T)
+            
+        # Intersection at depth d
+        x_d = len(set1.intersection(set2))
+
+        # Agreement at depth d
+        a_d = x_d/d   
+            
+        # Summation
+        summation_term = summation_term + math.pow(p, d) * a_d
+
+    # Rank Biased Overlap - extrapolated
+    rbo_ext = (x_k/k) * math.pow(p, k) + ((1-p)/p * summation_term)
+
+    return rbo_ext
 

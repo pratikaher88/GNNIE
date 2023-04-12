@@ -6,7 +6,7 @@ from collections import defaultdict
 import numpy as np
 import pickle
 from settings import BASE_DIR, CONFIG_PATH
-from evaluation.evaluation_metrics import mmr,hit_rate_precision, hit_rate_recall
+from evaluation.evaluation_metrics import mmr,hit_rate_precision, hit_rate_recall, rbo
 
 # Function to load yaml configuration file
 print("2",BASE_DIR)
