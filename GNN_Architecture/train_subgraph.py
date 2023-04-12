@@ -5,6 +5,20 @@ from Model.model import ConvModel
 from Model.loss import max_margin_loss, binary_cross_entropy_loss
 from settings import BASE_DIR, CONFIG_PATH
 
+
+def get_model_size(model):
+    param_size = 0
+    for param in model.parameters():
+        param_size += param.nelement() * param.element_size()
+
+    buffer_size = 0
+    for buffer in model.buffers():
+        buffer_size += buffer.nelement() * buffer.element_size()
+
+    size_all_mb = (param_size + buffer_size) / 1024**2
+    print('model size: {:.3f}MB'.format(size_all_mb))
+
+
 start = time.time()
 
 # Function to load yaml configuration file
@@ -130,6 +144,8 @@ for i in range(model_config['n_epochs']):
         optimizer.step()
 
         batch += 1
+
+        print(get_model_size(model))
 
         # print(f'batch: {batch} of {num_batches}')
     
