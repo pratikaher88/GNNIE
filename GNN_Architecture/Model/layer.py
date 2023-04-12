@@ -139,7 +139,7 @@ class ConvLayer(nn.Module):
                 fn.u_mul_e('h', 'edge_weights', 'm'),
                 fn.max('m', 'neigh'))
         
-        if self._aggre_type == 'sum':
+        elif self._aggre_type == 'sum':
             graph.update_all(
                 fn.u_mul_e('h', 'edge_weights', 'm'),
                 fn.sum('m', 'neigh'))
