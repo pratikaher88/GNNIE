@@ -1,4 +1,4 @@
-input_graph_name: ecommerce_hetero_graph_with_sf.dgl
+input_graph_name: ecommerce_hetero_graph.dgl
 aggregate_fn: mean
 n_epochs: 10
 batch_size: 512
