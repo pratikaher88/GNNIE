@@ -1,9 +1,11 @@
 import dgl, torch, pickle
 import numpy as np
-import os, random, yaml
+import os, random, yaml, time
 from Model.model import ConvModel
 from Model.loss import max_margin_loss, binary_cross_entropy_loss
 from settings import BASE_DIR, CONFIG_PATH
+
+start = time.time()
 
 # Function to load yaml configuration file
 def load_config(config_name):
@@ -142,3 +144,6 @@ torch.save({'epoch': i,
         f'{BASE_DIR}/graph_files_subgraph/trained_model.pth')
 
 print("Training complete: saved model to :", f'{BASE_DIR}/graph_files_subgraph/trained_model.pth')
+
+
+print(time.time() - start)
