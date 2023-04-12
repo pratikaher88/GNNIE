@@ -96,10 +96,8 @@ dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/ecommerce_hetero_graph_subgrap
 # model building
 
 model = ConvModel(ecommerce_hetero_graph_subgraph, model_config['num_layers'], dim_dict, aggregator_type=model_config['aggregate_fn'], pred=model_config['pred'])
-get_model_size(model)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=model_config['learning_rate'],weight_decay=0)
-get_model_size(model)
 
 
 for i in range(model_config['n_epochs']):
@@ -136,14 +134,14 @@ for i in range(model_config['n_epochs']):
 
         batch += 1
 
-        get_model_size(model)
-
         # print(f'batch: {batch} of {num_batches}')
     
     print(f'Total loss at epoch {i} :',total_loss)
 
     # torch.save(model, 'mpnn_model_save.pth')
     # torch.save(model.state_dict(), 'f"{BASE_DIR}/graph_files/trained_model.pth')
+get_model_size(model)
+
 torch.save({'epoch': i,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
