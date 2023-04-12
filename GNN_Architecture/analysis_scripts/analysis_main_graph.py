@@ -77,11 +77,8 @@ edge_sampler = dgl.dataloading.EdgePredictionSampler(
     exclude='self')
 
 valid_eids_dict = {}
-
-eids = np.arange(valid_g.number_of_edges(etype='orders'))
-
-for e in valid_g.etypes:
-    valid_eids_dict[e] = eids
+for e in valid_g.edata[dgl.EID].keys():
+    valid_eids_dict[e[1]] = valid_g.edata[dgl.EID][e]
 
 print(valid_g)
 
