@@ -4,6 +4,7 @@ import os, random, yaml, time
 from Model.model import ConvModel
 from Model.loss import max_margin_loss, binary_cross_entropy_loss
 from settings import BASE_DIR, CONFIG_PATH
+from helper import get_model_size
 
 start = time.time()
 
@@ -95,7 +96,9 @@ dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/ecommerce_hetero_graph_subgrap
 # model building
 
 model = ConvModel(ecommerce_hetero_graph_subgraph, model_config['num_layers'], dim_dict, aggregator_type=model_config['aggregate_fn'], pred=model_config['pred'])
+
 optimizer = torch.optim.Adam(model.parameters(), lr=model_config['learning_rate'],weight_decay=0)
+
 
 for i in range(model_config['n_epochs']):
 
@@ -137,6 +140,8 @@ for i in range(model_config['n_epochs']):
 
     # torch.save(model, 'mpnn_model_save.pth')
     # torch.save(model.state_dict(), 'f"{BASE_DIR}/graph_files/trained_model.pth')
+get_model_size(model)
+
 torch.save({'epoch': i,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
