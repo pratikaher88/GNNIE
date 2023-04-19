@@ -252,7 +252,7 @@ def add_features_to_graph(g: dgl.DGLGraph, feature_tensor_to_add: torch.tensor):
     
     # TODO: removed exisiting features for now
     feature_tensor_to_add = concat_feature_tensors(node_types=g.ntypes,
-#                                                     exist_feature=exist_features, 
+                                                    exist_feature=exist_features, 
                                                     feature_tensor_to_add=feature_tensor_to_add)
     # append features to the graph
     for ntype in g.ntypes:
