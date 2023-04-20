@@ -71,7 +71,7 @@ def create_already_rated(g):
 already_rated_dict = create_already_rated(train_g)
 recommendations_from_valid_graph = get_ground_truth_recs(valid_g)
 
-print("Number of recommendations in valid graph",sum(len(value) for value in recommendations_from_valid_graph.values()))
+print("Number of recommendations in valid graph", sum(len(value) for value in recommendations_from_valid_graph.values()))
 
 neg_sampler = dgl.dataloading.negative_sampler.Uniform(2)
 node_sampler = dgl.dataloading.NeighborSampler(fanouts=[-1, -1])

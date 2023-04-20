@@ -88,7 +88,7 @@ print("Number of batches ",len(dataloader))
 dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/train_g.dgl", [train_g])
 dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/valid_g.dgl", [valid_g])
 dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/test_g.dgl", [test_g])
-dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/ecommerce_hetero_graph_subgraph.dgl", [ecommerce_hetero_graph_subgraph])
+dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/{graph_name}", [ecommerce_hetero_graph_subgraph])
 
 # with open( f'{BASE_DIR}/graph_files_subgraph/valid_eids_dict.pickle', 'wb') as f:
 #     pickle.dump(valid_eids_dict, f, pickle.HIGHEST_PROTOCOL)
