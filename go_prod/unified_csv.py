@@ -7,7 +7,7 @@
 import pandas as pd
 import numpy as np
 
-BASE_DIR_ARCHIVE = 'DatasetEDA/archive'
+BASE_DIR_ARCHIVE = '/Users/benjaminfell/Documents/GitHub/GNNIE/DatasetEDA/archive'
 
 customer_data = pd.read_csv(f'{BASE_DIR_ARCHIVE}/olist_customers_dataset.csv')
 geolocation_data = pd.read_csv(f'{BASE_DIR_ARCHIVE}/olist_geolocation_dataset.csv')
