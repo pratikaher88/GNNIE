@@ -5,6 +5,10 @@ from evaluation import baseline_model_generator
 from collections import defaultdict
 import numpy as np
 from settings import BASE_DIR, CONFIG_PATH
+from evaluation.evaluation_metrics import mmr,hit_rate_precision, hit_rate_recall, rbo
+import matplotlib.pyplot as plt
+import random
+
 
 # Function to load yaml configuration file
 def load_config(config_name):
@@ -197,19 +201,90 @@ baseline_model = baseline_model_generator.generate_popularity_model(ecommerce_he
 # print(model_recommendations)
 
 
-from evaluation.evaluation_metrics import mmr,hit_rate_accuracy, hit_rate_recall
 
-print("Precision GNN Model: ", round(hit_rate_accuracy(recommendations_from_valid_graph, model_recommendations, 40), 5))
-print("Precision Random Model: ", round(hit_rate_accuracy(recommendations_from_valid_graph, random_model, 40), 5))
-print("Precision Popularity Model: ", round(hit_rate_accuracy(recommendations_from_valid_graph, baseline_model, 40), 5))
+## EVALUATION METRICS
 
-print('------------------')
+random_model = baseline_model_generator.generate_random_model(ecommerce_hetero_graph_subgraph, 'customer', 'product')
+baseline_model = baseline_model_generator.generate_popularity_model(ecommerce_hetero_graph_subgraph, 'orders', 'customer')
 
-print("Recall GNN Model: ", round(hit_rate_recall(recommendations_from_valid_graph, model_recommendations, 40), 5))
-print("Recall Random Model: ", round(hit_rate_recall(recommendations_from_valid_graph, random_model, 40), 5))
-print("Recall Popularity Model: ", round(hit_rate_recall(recommendations_from_valid_graph, baseline_model, 40), 5))
+#MRR
+print("MRR Popular: ", mmr(recommendations_from_valid_graph, baseline_model, 1))
+print("MRR Random: ", mmr(recommendations_from_valid_graph, random_model, 1))
+print("MRR GNN Model: ", mmr(recommendations_from_valid_graph, model_recommendations, 1))
 
-# print("MMR GNN Model: ", mmr(HM, model_recommendations, 30))
-# print("MMR Random Model: ", mmr(HM, random_model, 30))
-# print("MMR Popularity Model: ", mmr(HM, baseline_model, 30))
+#HIT RATES
+thresholds = [5,10,15,20,25,30,35,40,45,50]
+
+hit_rates_prec_baseline = []
+hit_rates_prec_random = []
+hit_rates_prec_model = []
+
+hit_rates_recall_baseline = []
+hit_rates_recall_random = []
+hit_rates_recall_model = []
+
+for t in thresholds:
+    hit_rates_prec_baseline.append(hit_rate_precision(recommendations_from_valid_graph, baseline_model, t))
+    hit_rates_prec_random.append(hit_rate_precision(recommendations_from_valid_graph, random_model, t))
+    hit_rates_prec_model.append(hit_rate_precision(recommendations_from_valid_graph, model_recommendations, t))
+    hit_rates_recall_baseline.append(hit_rate_recall(recommendations_from_valid_graph, baseline_model, t))
+    hit_rates_recall_random.append(hit_rate_recall(recommendations_from_valid_graph, random_model, t))
+    hit_rates_recall_model.append(hit_rate_recall(recommendations_from_valid_graph, model_recommendations, t))
+    
+fig = plt.figure()
+plt.plot(thresholds,hit_rates_prec_baseline, label = "Popularity Model")
+plt.plot(thresholds,hit_rates_prec_random, label = "Random Model")
+plt.plot(thresholds,hit_rates_prec_model, label = "GNNIE Model")
+plt.legend()
+plt.xlabel("# Recs per Customer")
+plt.ylabel("Hit Rate")
+plt.title("Hit Rate Precision Performance")
+fig.savefig('hit_rate_precision.png', dpi=fig.dpi)
+
+fig = plt.figure()
+plt.plot(thresholds,hit_rates_recall_baseline, label = "Popularity Model")
+plt.plot(thresholds,hit_rates_recall_random, label = "Random Model")
+plt.plot(thresholds,hit_rates_recall_model, label = "GNNIE Model")
+plt.legend()
+plt.xlabel("# Recs per Customer")
+plt.ylabel("Hit Rate")
+plt.title("Hit Rate Recall Performance")
+fig.savefig('hit_rate_recall.png', dpi=fig.dpi)
+
+
+#RBO
+
+# Popular vs. Random
+rbo_scores_5 = []
+rbo_scores_15 = []
+rbo_scores_30 = []
+
+recs_sample = random.sample(list(model_recommendations.items()), 2000)
+
+for i in range(0,len(recs_sample)):
+    rbo_scores_5.append(rbo(baseline_model[0][0:100],random.sample(list(random_model[0]), 100),0.76))
+    rbo_scores_15.append(rbo(baseline_model[0][0:100],random.sample(list(random_model[0]), 100),0.9165))
+    rbo_scores_30.append(rbo(baseline_model[0][0:100],random.sample(list(random_model[0]), 100),0.9578))
+    
+print("Random-Popularity RBO giving 90% weight to first 5 recs: ", sum(rbo_scores_5) / len(rbo_scores_5))
+print("Random-Popularity RBO giving 90% weight to first 15 recs: ", sum(rbo_scores_15) / len(rbo_scores_15))
+print("Random-Popularity RBO giving 90% weight to first 30 recs: ", sum(rbo_scores_30) / len(rbo_scores_30))
+
+
+# Popular vs. GNNIE
+rbo_scores_5 = []
+rbo_scores_15 = []
+rbo_scores_30 = []
+
+recs_sample = random.sample(list(model_recommendations.items()), 2000)
+
+for i in range(0,len(recs_sample)):
+    rbo_scores_5.append(rbo(baseline_model[0][0:100],recs_sample[i][1][0:100],0.76))
+    rbo_scores_15.append(rbo(baseline_model[0][0:100],recs_sample[i][1][0:100],0.9165))
+    rbo_scores_30.append(rbo(baseline_model[0][0:100],recs_sample[i][1][0:100],0.9578))
+
+print("GNNIE-Popularity RBO giving 90% weight to first 5 recs: ", sum(rbo_scores_5) / len(rbo_scores_5))
+print("GNNIE-Popularity RBO giving 90% weight to first 15 recs: ", sum(rbo_scores_15) / len(rbo_scores_15))
+print("GNNIE-Popularity RBO giving 90% weight to first 30 recs: ", sum(rbo_scores_30) / len(rbo_scores_30))
+
 
