@@ -11,5 +11,5 @@ pred: cos
 learning_rate: 0.0001
 num_layers: 3
 num_workers: 0
-number_of_egdes: 500
+number_of_egdes: 10000
 train_full: True
