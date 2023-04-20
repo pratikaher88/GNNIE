@@ -207,6 +207,8 @@ baseline_model = baseline_model_generator.generate_popularity_model(ecommerce_he
 random_model = baseline_model_generator.generate_random_model(ecommerce_hetero_graph_subgraph, 'customer', 'product')
 baseline_model = baseline_model_generator.generate_popularity_model(ecommerce_hetero_graph_subgraph, 'orders', 'customer')
 
+print("graph_details: ", graph_details, file=op_file)
+
 #MRR
 print("MRR Popular: ", mmr(recommendations_from_valid_graph, baseline_model, 1), file=op_file)
 print("MRR Random: ", mmr(recommendations_from_valid_graph, random_model, 1), file=op_file)
