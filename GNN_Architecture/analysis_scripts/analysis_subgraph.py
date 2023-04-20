@@ -21,6 +21,7 @@ print("Loading model config")
 model_config = load_config("model_config.yml")
 
 graph_name = model_config['input_graph_name']
+graph_details = model_config['graph_details']
 graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/{graph_name}")
 ecommerce_hetero_graph_subgraph = graphs[0]
 
@@ -237,7 +238,7 @@ plt.plot(thresholds,hit_rates_prec_model, label = "GNNIE Model")
 plt.legend()
 plt.xlabel("# Recs per Customer")
 plt.ylabel("Hit Rate")
-plt.title("Hit Rate Precision Performance")
+plt.title(f"Hit Rate Precision Performance: {graph_details}")
 fig.savefig(f'{BASE_DIR}/hit_rate_precision.png', dpi=fig.dpi)
 
 fig = plt.figure()
@@ -247,8 +248,8 @@ plt.plot(thresholds,hit_rates_recall_model, label = "GNNIE Model")
 plt.legend()
 plt.xlabel("# Recs per Customer")
 plt.ylabel("Hit Rate")
-plt.title("Hit Rate Recall Performance")
-fig.savefig(f'{BASE_DIR}hit_rate_recall.png', dpi=fig.dpi)
+plt.title(f"Hit Rate Recall Performance : {graph_details}")
+fig.savefig(f'{BASE_DIR}/hit_rate_recall.png', dpi=fig.dpi)
 
 
 #RBO
