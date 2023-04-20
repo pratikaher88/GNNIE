@@ -9,6 +9,7 @@ from evaluation.evaluation_metrics import mmr,hit_rate_precision, hit_rate_recal
 import matplotlib.pyplot as plt
 import random
 
+op_file = open(f"{BASE_DIR}/output.txt", "a")
 
 # Function to load yaml configuration file
 def load_config(config_name):
@@ -45,7 +46,7 @@ mpnn_model = ConvModel(ecommerce_hetero_graph_subgraph, model_config['num_layers
 mpnn_model.load_state_dict(saved_model['model_state_dict'])
 mpnn_model.eval()
 
-print("Validating model", valid_g)
+print(f"Validating model : {valid_g}", file=op_file)
 
 from collections import defaultdict
 
@@ -75,7 +76,7 @@ def create_already_rated(g):
 already_rated_dict = create_already_rated(train_g)
 recommendations_from_valid_graph = get_ground_truth_recs(valid_g)
 
-print("Number of recommendations in valid graph", sum(len(value) for value in recommendations_from_valid_graph.values()))
+print("Number of recommendations in valid graph :", sum(len(value) for value in recommendations_from_valid_graph.values()) , file=op_file)
 
 neg_sampler = dgl.dataloading.negative_sampler.Uniform(2)
 node_sampler = dgl.dataloading.NeighborSampler(fanouts=[-1, -1])
@@ -88,8 +89,6 @@ edge_sampler = dgl.dataloading.EdgePredictionSampler(
 valid_eids_dict = {}
 for e in valid_g.edata[dgl.EID].keys():
     valid_eids_dict[e[1]] = valid_g.edata[dgl.EID][e]
-
-print(valid_g)
 
 valid_dataloader = dgl.dataloading.DataLoader(ecommerce_hetero_graph_subgraph, valid_eids_dict, edge_sampler,  shuffle=True, drop_last= False, batch_size=1024, num_workers=0)
 
@@ -208,9 +207,9 @@ random_model = baseline_model_generator.generate_random_model(ecommerce_hetero_g
 baseline_model = baseline_model_generator.generate_popularity_model(ecommerce_hetero_graph_subgraph, 'orders', 'customer')
 
 #MRR
-print("MRR Popular: ", mmr(recommendations_from_valid_graph, baseline_model, 1))
-print("MRR Random: ", mmr(recommendations_from_valid_graph, random_model, 1))
-print("MRR GNN Model: ", mmr(recommendations_from_valid_graph, model_recommendations, 1))
+print("MRR Popular: ", mmr(recommendations_from_valid_graph, baseline_model, 1), file=op_file)
+print("MRR Random: ", mmr(recommendations_from_valid_graph, random_model, 1), file=op_file)
+print("MRR GNN Model: ", mmr(recommendations_from_valid_graph, model_recommendations, 1), file=op_file)
 
 #HIT RATES
 thresholds = [5,10,15,20,25,30,35,40,45,50]
@@ -239,7 +238,7 @@ plt.legend()
 plt.xlabel("# Recs per Customer")
 plt.ylabel("Hit Rate")
 plt.title("Hit Rate Precision Performance")
-fig.savefig('hit_rate_precision.png', dpi=fig.dpi)
+fig.savefig(f'{BASE_DIR}/hit_rate_precision.png', dpi=fig.dpi)
 
 fig = plt.figure()
 plt.plot(thresholds,hit_rates_recall_baseline, label = "Popularity Model")
@@ -249,7 +248,7 @@ plt.legend()
 plt.xlabel("# Recs per Customer")
 plt.ylabel("Hit Rate")
 plt.title("Hit Rate Recall Performance")
-fig.savefig('hit_rate_recall.png', dpi=fig.dpi)
+fig.savefig(f'{BASE_DIR}hit_rate_recall.png', dpi=fig.dpi)
 
 
 #RBO
@@ -266,9 +265,9 @@ for i in range(0,len(recs_sample)):
     rbo_scores_15.append(rbo(baseline_model[0][0:100],random.sample(list(random_model[0]), 100),0.9165))
     rbo_scores_30.append(rbo(baseline_model[0][0:100],random.sample(list(random_model[0]), 100),0.9578))
     
-print("Random-Popularity RBO giving 90% weight to first 5 recs: ", sum(rbo_scores_5) / len(rbo_scores_5))
-print("Random-Popularity RBO giving 90% weight to first 15 recs: ", sum(rbo_scores_15) / len(rbo_scores_15))
-print("Random-Popularity RBO giving 90% weight to first 30 recs: ", sum(rbo_scores_30) / len(rbo_scores_30))
+print("Random-Popularity RBO giving 90% weight to first 5 recs: ", sum(rbo_scores_5) / len(rbo_scores_5), file=op_file)
+print("Random-Popularity RBO giving 90% weight to first 15 recs: ", sum(rbo_scores_15) / len(rbo_scores_15), file=op_file)
+print("Random-Popularity RBO giving 90% weight to first 30 recs: ", sum(rbo_scores_30) / len(rbo_scores_30), file=op_file)
 
 
 # Popular vs. GNNIE
@@ -283,8 +282,8 @@ for i in range(0,len(recs_sample)):
     rbo_scores_15.append(rbo(baseline_model[0][0:100],recs_sample[i][1][0:100],0.9165))
     rbo_scores_30.append(rbo(baseline_model[0][0:100],recs_sample[i][1][0:100],0.9578))
 
-print("GNNIE-Popularity RBO giving 90% weight to first 5 recs: ", sum(rbo_scores_5) / len(rbo_scores_5))
-print("GNNIE-Popularity RBO giving 90% weight to first 15 recs: ", sum(rbo_scores_15) / len(rbo_scores_15))
-print("GNNIE-Popularity RBO giving 90% weight to first 30 recs: ", sum(rbo_scores_30) / len(rbo_scores_30))
+print("GNNIE-Popularity RBO giving 90% weight to first 5 recs: ", sum(rbo_scores_5) / len(rbo_scores_5), file=op_file)
+print("GNNIE-Popularity RBO giving 90% weight to first 15 recs: ", sum(rbo_scores_15) / len(rbo_scores_15), file=op_file)
+print("GNNIE-Popularity RBO giving 90% weight to first 30 recs: ", sum(rbo_scores_30) / len(rbo_scores_30), file=op_file)
 
 
