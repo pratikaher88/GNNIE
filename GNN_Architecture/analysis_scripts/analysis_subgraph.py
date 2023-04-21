@@ -290,3 +290,4 @@ print("GNNIE-Popularity RBO giving 90% weight to first 15 recs: ", sum(rbo_score
 print("GNNIE-Popularity RBO giving 90% weight to first 30 recs: ", sum(rbo_scores_30) / len(rbo_scores_30), file=op_file)
 
 
+op_file.close()

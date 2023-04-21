@@ -16,8 +16,8 @@ from datetime import timedelta
 
 
 # CONFIGS
-UNIFIED_CSV_PATH = '/Users/benjaminfell/Documents/GitHub/GNNIE/DatasetEDA/archive/unified.csv'
-BASE_DIR = '/Users/benjaminfell/Documents/GitHub/GNNIE/go_prod'
+UNIFIED_CSV_PATH = '/Users/pratikaher/SPRING23/Capstone/DatasetEDA/archive/unified.csv'
+BASE_DIR = '/Users/pratikaher/SPRING23/Capstone/go_prod'
 
 USER_NODE = "customer_id"
 PRODUCT_NODE = "product_id"
