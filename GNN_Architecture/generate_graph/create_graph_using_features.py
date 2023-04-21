@@ -119,8 +119,10 @@ def _process_revorder_features(df_final):
     return HM
 
 orderid_to_feat = _process_revorder_features(df_final)
-revorder_features = [value[1] for value in list(orderid_to_feat.items())]
-ecommerce_hetero_graph.edges['rev-orders'].data['features'] = torch.stack(revorder_features, axis=0).unsqueeze(-1)
+revorder_features = [value[1].squeeze() for value in list(orderid_to_feat.items())]
+
+print(revorder_features[0])
+ecommerce_hetero_graph.edges['rev-orders'].data['features'] = torch.stack(revorder_features, axis=0).unsqueeze(-1).unsqueeze(-1)
 
 ### graph validation is skipped for now because it's not generalized yet ###
 
@@ -132,7 +134,10 @@ ecommerce_hetero_graph.edges['rev-orders'].data['features'] = torch.stack(revord
 # print(validate_edges(ecommerce_hetero_graph, df_final, 'rev-orders', 'product_id_int', 'customer_id_int'))
 
 print(ecommerce_hetero_graph.nodes['product'].data['features'].shape)
+print(ecommerce_hetero_graph.nodes['customer'].data['features'].shape)
 print(ecommerce_hetero_graph.edges['orders'].data['features'].shape)
+print(ecommerce_hetero_graph.edges['rev-orders'].data['features'].shape)
+
 
 SAVE_DIR = 'run_data/graph_files_subgraph/'
 print("SAVE GRAPH !!")
