@@ -4,12 +4,12 @@ import torch.nn as nn
 from evaluation import baseline_model_generator
 from collections import defaultdict
 import numpy as np
-from settings import BASE_DIR, CONFIG_PATH
+from settings import BASE_DIR, CONFIG_PATH, MODEL_DIR
 from evaluation.evaluation_metrics import mmr,hit_rate_precision, hit_rate_recall, rbo
 import matplotlib.pyplot as plt
 import random
 
-op_file = open(f"{BASE_DIR}/output.txt", "a")
+op_file = open(f"{BASE_DIR}/{MODEL_DIR}/output.txt", "a")
 
 # Function to load yaml configuration file
 def load_config(config_name):
@@ -241,7 +241,7 @@ plt.legend()
 plt.xlabel("# Recs per Customer")
 plt.ylabel("Hit Rate")
 plt.title(f"Hit Rate Precision Performance: {graph_details}")
-fig.savefig(f'{BASE_DIR}/hit_rate_precision.png', dpi=fig.dpi)
+fig.savefig(f'{BASE_DIR}/{MODEL_DIR}/hit_rate_precision.png', dpi=fig.dpi)
 
 fig = plt.figure()
 plt.plot(thresholds,hit_rates_recall_baseline, label = "Popularity Model")
@@ -251,7 +251,7 @@ plt.legend()
 plt.xlabel("# Recs per Customer")
 plt.ylabel("Hit Rate")
 plt.title(f"Hit Rate Recall Performance : {graph_details}")
-fig.savefig(f'{BASE_DIR}/hit_rate_recall.png', dpi=fig.dpi)
+fig.savefig(f'{BASE_DIR}/{MODEL_DIR}/hit_rate_recall.png', dpi=fig.dpi)
 
 
 #RBO

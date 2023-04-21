@@ -180,6 +180,9 @@ print(validate_edges(ecommerce_hetero_graph, df_final, 'orders', 'customer_id_in
 print(validate_edges(ecommerce_hetero_graph, df_final, 'rev-orders', 'product_id_int', 'customer_id_int'))
 print(validate_edge_features(ecommerce_hetero_graph, df_final, 'orders', ['is_reviewed']))
 
+print(ecommerce_hetero_graph.nodes['product'].data['features'].shape, ecommerce_hetero_graph.nodes['customer'].data['features'].shape)
+print(ecommerce_hetero_graph.edges['orders'].data['features'].shape)
+
 print("SAVE GRAPH !!")
 dgl.save_graphs(f"{BASE_DIR}/created_graphs/ecommerce_hetero_graph.dgl", [ecommerce_hetero_graph])
 
