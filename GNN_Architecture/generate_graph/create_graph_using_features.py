@@ -12,6 +12,7 @@ BASE_DIR = 'generate_graph/graph_files' # set this up before running this file
 # import the whole set of data features
 df_final = pd.read_csv(BASE_DIR+"/features.csv")
 
+# df_final = df_final.head(20)
 
 # create list of features that belongs to different type of nodes
 list_of_features = list(df_final.columns)
@@ -95,7 +96,7 @@ def _process_product_features(df_final):
     return HM
 prodid_to_feat = _process_product_features(df_final)
 product_features = [value[1].squeeze() for value in list(prodid_to_feat.items())]
-ecommerce_hetero_graph.nodes['product'].data['features'] = torch.stack(product_features)
+ecommerce_hetero_graph.nodes['product'].data['features'] = torch.stack(product_features, 0)
 
 
 ### edge feature assignment ###
@@ -108,7 +109,7 @@ def _process_order_features(df_final):
 
 orderid_to_feat = _process_order_features(df_final)
 order_features = [value[1].squeeze() for value in list(orderid_to_feat.items())]
-ecommerce_hetero_graph.edges['orders'].data['features'] = torch.stack(order_features, axis=0).unsqueeze(-1)
+ecommerce_hetero_graph.edges['orders'].data['features'] = torch.stack(order_features, axis=0)
 
 # print(ecommerce_hetero_graph.edges['orders'].data['features'].shape)
 
@@ -121,8 +122,8 @@ def _process_revorder_features(df_final):
 orderid_to_feat = _process_revorder_features(df_final)
 revorder_features = [value[1].squeeze() for value in list(orderid_to_feat.items())]
 
-print(revorder_features[0])
-ecommerce_hetero_graph.edges['rev-orders'].data['features'] = torch.stack(revorder_features, axis=0).unsqueeze(-1).unsqueeze(-1)
+# print(revorder_features[0])
+ecommerce_hetero_graph.edges['rev-orders'].data['features'] = torch.stack(revorder_features, axis=0).unsqueeze(-1)
 
 ### graph validation is skipped for now because it's not generalized yet ###
 

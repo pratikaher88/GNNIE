@@ -2,11 +2,11 @@ import numpy as np
 
 def get_recommendations_combined_with_popularity(rec_list, pop_list, epsilon = 0, sample_values = False):
     '''
-    The input is the list of all products along with thier scores not in a soerted order. 
+    The input is the list of all products along with thier scores not in a sorted order. 
     e.g [100, 20, 120, 200] : this means that product 0 has score 0, product 1 has score 20, product 3 has score 120 and so on.
     '''
-    rec_scores = rec_scores / np.sum(rec_list)
-    pop_scores = pop_scores / np.sum(pop_list)
+    rec_scores = rec_scores / np.max(rec_list)
+    pop_scores = pop_scores / np.max(pop_list)
 
     combined_scores = epsilon*pop_scores + (1-epsilon)*rec_scores
 

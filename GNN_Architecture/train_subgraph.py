@@ -34,12 +34,16 @@ else:
     # ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : [random.randint(1, 10000) for i in range(1000)], 'rev-orders' : [random.randint(1, 10000) for i in range(1000)] } )
 
 print("Training Graph: ",ecommerce_hetero_graph_subgraph)
-
 print("Input nodes shape : ", ecommerce_hetero_graph_subgraph.ndata['features']['customer'].shape, ecommerce_hetero_graph_subgraph.ndata['features']['product'].shape)
 
 dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['features'].shape[1],
             'product': ecommerce_hetero_graph_subgraph.nodes['product'].data['features'].shape[1],
-            'edge_dim': ecommerce_hetero_graph_subgraph.edges['orders'].data['features'].shape[1],
+            'orders' : {
+                'edge_dim': ecommerce_hetero_graph_subgraph.edges['orders'].data['features'].shape[1],
+            },
+            'rev-orders' : {
+                'edge_dim': ecommerce_hetero_graph_subgraph.edges['rev-orders'].data['features'].shape[1],
+            },
             'edge_hidden_dim': model_config['edge_hidden_dim'],
             'hidden_dim' : model_config['hidden_dim'],
             'out_dim': model_config['output_dim']
@@ -116,9 +120,9 @@ for i in range(model_config['n_epochs']):
         for key, value in edge_features.items():
             HM[key[1]] = (value, )
         
-    #     # print("Edge Features shape : ", HM['orders'][0].shape, HM['rev-orders'][0].shape)
-    #     # print(input_features)
-    #     # print(len(blocks))
+        # print("Edge Features shape : ", HM['orders'][0].shape, HM['rev-orders'][0].shape)
+        # print(input_features)
+        # print(len(blocks))
 
         _, pos_score, neg_score = model(blocks, input_features, HM, pos_g, neg_g)
 

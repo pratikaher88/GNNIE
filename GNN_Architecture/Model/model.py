@@ -38,8 +38,8 @@ class ConvModel(nn.Module):
         for _ in range(n_layers - 2):
             self.layers.append(
                 dglnn.HeteroGraphConv(
-                    {etype[1]: ConvLayer((dim_dict['hidden_dim'], dim_dict['hidden_dim']), dim_dict['hidden_dim'], dim_dict['edge_dim'], nn.Sequential(
-                                                nn.Linear(dim_dict['edge_dim'], dim_dict['edge_hidden_dim']),
+                    {etype[1]: ConvLayer((dim_dict['hidden_dim'], dim_dict['hidden_dim']), dim_dict['hidden_dim'], dim_dict[etype[1]]['edge_dim'], nn.Sequential(
+                                                nn.Linear(dim_dict[etype[1]]['edge_dim'], dim_dict['edge_hidden_dim']),
                                                 nn.ReLU(),
                                                 nn.Linear(dim_dict['edge_hidden_dim'], dim_dict['hidden_dim']*dim_dict['hidden_dim'])
                                             ), dropout,
@@ -51,8 +51,8 @@ class ConvModel(nn.Module):
 
         self.layers.append(
             dglnn.HeteroGraphConv(
-                {etype[1]: ConvLayer((dim_dict['hidden_dim'], dim_dict['hidden_dim']), dim_dict['out_dim'], dim_dict['edge_dim'], nn.Sequential(
-                                                nn.Linear(dim_dict['edge_dim'], dim_dict['edge_hidden_dim']),
+                {etype[1]: ConvLayer((dim_dict['hidden_dim'], dim_dict['hidden_dim']), dim_dict['out_dim'], dim_dict[etype[1]]['edge_dim'], nn.Sequential(
+                                                nn.Linear(dim_dict[etype[1]]['edge_dim'], dim_dict['edge_hidden_dim']),
                                                 nn.ReLU(),
                                                 nn.Linear(dim_dict['edge_hidden_dim'], dim_dict['hidden_dim']*dim_dict['out_dim'])
                                             ), dropout,
