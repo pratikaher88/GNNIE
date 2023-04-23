@@ -27,6 +27,7 @@ ecommerce_hetero_graph = graphs[0]
 # ecommerce_hetero_graph_subgraph = ecommerce_hetero_graph.subgraph({ 'customer' :list(range(1000)), 'product': list(range(ecommerce_hetero_graph.num_nodes('product')))})
 
 if model_config['train_full'] == True:
+    print("Training on full graph")
     ecommerce_hetero_graph_subgraph = ecommerce_hetero_graph
 else:
     number_of_egdes = model_config['number_of_egdes']
