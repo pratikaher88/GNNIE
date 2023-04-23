@@ -326,7 +326,7 @@ def feature_engineering(df):
     print("Extracting PRODUCT Features...")
 
     if "gnn_product_reviews_average" in PRODUCT_FEATURES:
-        df_order_items['gnn_product_reviews_last'] = df_order_items.groupby('product_id')['review_score'].transform('mean')
+        df_order_items['gnn_product_reviews_average'] = df_order_items.groupby('product_id')['review_score'].transform('mean')
     
     if "gnn_product_reviews_last" in PRODUCT_FEATURES:
         df_order_items['gnn_product_reviews_last'] = df_order_items.groupby('product_id')['review_score'].transform('last')
