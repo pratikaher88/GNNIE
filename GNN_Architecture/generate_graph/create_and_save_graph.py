@@ -111,9 +111,9 @@ df_final['is_reviewed'] = (df_final['review_comment_message'] != 'no_review').as
 df_final = df_final.sample(frac=1, random_state=42)
 df_final.reset_index(drop=True, inplace=True)
 
-# df_final.drop_duplicates(subset=['product_id', 'customer_id'], keep='first', inplace=True)
+df_final.drop_duplicates(subset=['product_id', 'customer_id'], keep='first', inplace=True)
 # reset the index
-# df_final.reset_index(drop=True, inplace=True)
+df_final.reset_index(drop=True, inplace=True)
 
 ### 
 
