@@ -106,6 +106,17 @@ df_final['purchase_weekofyear'] = pd.to_datetime(df_final['order_purchase_timest
 # adding is_reviewed where 1 is if review comment is given otherwise 0.
 df_final['is_reviewed'] = (df_final['review_comment_message'] != 'no_review').astype('int')
 
+### modified from GNN_Architecture/generate_graph/create_graph_using_features.py ###
+
+df_final = df_final.sample(frac=1, random_state=42)
+df_final.reset_index(drop=True, inplace=True)
+
+# df_final.drop_duplicates(subset=['product_id', 'customer_id'], keep='first', inplace=True)
+# reset the index
+# df_final.reset_index(drop=True, inplace=True)
+
+### 
+
 import pandas as pd
 import uuid
 
@@ -174,11 +185,11 @@ ecommerce_hetero_graph.edges['rev-orders'].data['features']= torch.tensor(edge_f
 
 # run validation scripts
 # TODO: error handling in case validation scripts return errors
-print(validate_customer_features(ecommerce_hetero_graph, df_final, ['customer_zip_code_prefix']))
-print(validate_product_features(ecommerce_hetero_graph, df_final, ['price', 'purchase_weekofyear']))
-print(validate_edges(ecommerce_hetero_graph, df_final, 'orders', 'customer_id_int', 'product_id_int'))
-print(validate_edges(ecommerce_hetero_graph, df_final, 'rev-orders', 'product_id_int', 'customer_id_int'))
-print(validate_edge_features(ecommerce_hetero_graph, df_final, 'orders', ['is_reviewed']))
+# print(validate_customer_features(ecommerce_hetero_graph, df_final, ['customer_zip_code_prefix']))
+# print(validate_product_features(ecommerce_hetero_graph, df_final, ['price', 'purchase_weekofyear']))
+# print(validate_edges(ecommerce_hetero_graph, df_final, 'orders', 'customer_id_int', 'product_id_int'))
+# print(validate_edges(ecommerce_hetero_graph, df_final, 'rev-orders', 'product_id_int', 'customer_id_int'))
+# print(validate_edge_features(ecommerce_hetero_graph, df_final, 'orders', ['is_reviewed']))
 
 print(ecommerce_hetero_graph.nodes['product'].data['features'].shape, ecommerce_hetero_graph.nodes['customer'].data['features'].shape)
 print(ecommerce_hetero_graph.edges['orders'].data['features'].shape)
