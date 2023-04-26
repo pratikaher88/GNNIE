@@ -12,7 +12,12 @@ BASE_DIR = 'generate_graph/graph_files' # set this up before running this file
 # import the whole set of data features
 df_final = pd.read_csv(BASE_DIR+"/features.csv")
 
+print(df_final.shape)
 # df_final = df_final.head(20)
+df_final.drop_duplicates(subset=['product_id', 'customer_id'], keep='first', inplace=True)
+# reset the index
+df_final.reset_index(drop=True, inplace=True)
+print(df_final.shape)
 
 # create list of features that belongs to different type of nodes
 list_of_features = list(df_final.columns)

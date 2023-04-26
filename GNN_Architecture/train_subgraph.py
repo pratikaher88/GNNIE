@@ -25,6 +25,7 @@ ecommerce_hetero_graph = graphs[0]
 
 # subgraph
 # ecommerce_hetero_graph_subgraph = ecommerce_hetero_graph.subgraph({ 'customer' :list(range(1000)), 'product': list(range(ecommerce_hetero_graph.num_nodes('product')))})
+delta =  model_config['delta']
 
 if model_config['train_full'] == True:
     print("Training on full graph")
@@ -93,7 +94,7 @@ print("Number of batches ",len(dataloader))
 dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/train_g.dgl", [train_g])
 dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/valid_g.dgl", [valid_g])
 dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/test_g.dgl", [test_g])
-dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/{graph_name}", [ecommerce_hetero_graph_subgraph])
+# dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/{graph_name}", [ecommerce_hetero_graph_subgraph])
 
 # with open( f'{BASE_DIR}/graph_files_subgraph/valid_eids_dict.pickle', 'wb') as f:
 #     pickle.dump(valid_eids_dict, f, pickle.HIGHEST_PROTOCOL)
@@ -127,7 +128,7 @@ for i in range(model_config['n_epochs']):
 
         _, pos_score, neg_score = model(blocks, input_features, HM, pos_g, neg_g)
 
-        loss = max_margin_loss(pos_score, neg_score)
+        loss = max_margin_loss(pos_score, neg_score, delta)
 
         total_loss += loss.item()
 

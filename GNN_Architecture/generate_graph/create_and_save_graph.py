@@ -5,7 +5,7 @@ import numpy as np
 from settings import BASE_DIR
 from validate_graph import validate_customer_features, validate_product_features, validate_edges,validate_edge_features
 
-BASE_DIR_ARCHIVE = '/Users/pratikaher/SPRING23/Capstone/DatasetEDA/archive'
+BASE_DIR_ARCHIVE = 'DatasetEDA/archive'
 
 customer_data = pd.read_csv(f'{BASE_DIR_ARCHIVE}/olist_customers_dataset.csv')
 geolocation_data = pd.read_csv(f'{BASE_DIR_ARCHIVE}/olist_geolocation_dataset.csv')
@@ -107,6 +107,7 @@ df_final['purchase_weekofyear'] = pd.to_datetime(df_final['order_purchase_timest
 df_final['is_reviewed'] = (df_final['review_comment_message'] != 'no_review').astype('int')
 
 ### modified from GNN_Architecture/generate_graph/create_graph_using_features.py ###
+# drop pulicates
 
 df_final = df_final.sample(frac=1, random_state=42)
 df_final.reset_index(drop=True, inplace=True)
