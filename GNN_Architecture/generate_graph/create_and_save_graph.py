@@ -1,11 +1,28 @@
 import dgl
-import torch
+import torch, os
 import pandas as pd
 import numpy as np
-from settings import BASE_DIR
+from settings import BASE_DIR, MODEL_DIR
 from validate_graph import validate_customer_features, validate_product_features, validate_edges,validate_edge_features
 
-BASE_DIR_ARCHIVE = 'DatasetEDA/archive'
+import argparse
+parser = argparse.ArgumentParser(description='Parse arguments for graph creation')
+# parser.add_argument("--remove_duplicates", default=False, help="Remove duplicate product id and customer id combination", type=bool)
+parser.add_argument('--remove_duplicates', action='store_true', help="Remove duplicate product id and customer id combination")
+
+args = parser.parse_args()
+
+remove_duplicates = args.remove_duplicates
+
+# BASE_DIR_ARCHIVE = 'DatasetEDA/archive'
+
+# Get the current directory
+full_path = os.path.realpath(__file__)
+current_dir, filename = os.path.split(full_path)
+UNIFIED_CSV_PATH = 'graph_files/unified.csv'
+BASE_DIR_ARCHIVE_PATH = 'graph_files/archive'
+
+BASE_DIR_ARCHIVE = os.path.join(current_dir, BASE_DIR_ARCHIVE_PATH)
 
 customer_data = pd.read_csv(f'{BASE_DIR_ARCHIVE}/olist_customers_dataset.csv')
 geolocation_data = pd.read_csv(f'{BASE_DIR_ARCHIVE}/olist_geolocation_dataset.csv')
@@ -25,6 +42,8 @@ order_product_item_dataset = pd.merge(order_items_dataset,order_products_dataset
 ordered_product_reviews = pd.merge(order_product_item_dataset,order_review_data,on='order_id')
 ordered_product_reviews_payments = pd.merge(ordered_product_reviews,order_payments_dataset,on='order_id')
 df_final = pd.merge(ordered_product_reviews_payments,customer_data,on='customer_id')
+
+df_final = pd.read_csv(os.path.join(current_dir, UNIFIED_CSV_PATH))
 
 
 # Handling missing values
@@ -107,14 +126,18 @@ df_final['purchase_weekofyear'] = pd.to_datetime(df_final['order_purchase_timest
 df_final['is_reviewed'] = (df_final['review_comment_message'] != 'no_review').astype('int')
 
 ### modified from GNN_Architecture/generate_graph/create_graph_using_features.py ###
-# drop pulicates
+# drop duplicates
 
-df_final = df_final.sample(frac=1, random_state=42)
-df_final.reset_index(drop=True, inplace=True)
+if remove_duplicates:
 
-df_final.drop_duplicates(subset=['product_id', 'customer_id'], keep='first', inplace=True)
-# reset the index
-df_final.reset_index(drop=True, inplace=True)
+    print("Removing duplicates of customer and product id combinations...")
+
+    df_final = df_final.sample(frac=1, random_state=42)
+    df_final.reset_index(drop=True, inplace=True)
+
+    df_final.drop_duplicates(subset=['product_id', 'customer_id'], keep='first', inplace=True)
+    # reset the index
+    df_final.reset_index(drop=True, inplace=True)
 
 ### 
 
@@ -196,7 +219,7 @@ print(ecommerce_hetero_graph.nodes['product'].data['features'].shape, ecommerce_
 print(ecommerce_hetero_graph.edges['orders'].data['features'].shape)
 
 print("SAVE GRAPH !!")
-dgl.save_graphs(f"{BASE_DIR}/created_graphs/ecommerce_hetero_graph.dgl", [ecommerce_hetero_graph])
+dgl.save_graphs(f"{BASE_DIR}/{MODEL_DIR}/ecommerce_hetero_graph.dgl", [ecommerce_hetero_graph])
 
 
 

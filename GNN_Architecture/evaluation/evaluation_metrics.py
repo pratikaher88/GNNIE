@@ -36,9 +36,16 @@ def hit_rate_precision(test_recs, recommendations, num_recs):
     if(num_recs==0): 
         return 0
     hits, total = 0, 0
+    count_none = 0
     for k, v in test_recs.items():
+        if recommendations.get(k) is None:
+            count_none += 1
+            continue
         hits += sum(edge in v for edge in recommendations.get(k)[:num_recs])
         total = total + num_recs
+    
+    if count_none > 0 :
+        print("Non-existent users in Precision :", count_none)
     
     return hits/total
 
@@ -47,9 +54,16 @@ def hit_rate_recall(test_recs, recommendations, num_recs):
     if(num_recs==0): 
         return 0
     hits, total = 0, 0
+    count_none = 0
     for k, v in test_recs.items():
+        if recommendations.get(k) is None:
+            count_none += 1
+            continue
         hits += sum(edge in v for edge in recommendations.get(k)[:num_recs])
         total += len(v)
+
+    if count_none:
+        print("Non-existent users in Recall :", count_none)
 
     return hits/total
 
@@ -87,8 +101,14 @@ DGL Heterograph"""
 def mmr(test_recs, recommendations, scaling_factor = 1):
     
     agg_rec_rank, total = 0, 0
+    count_none = 0
     for user, product_list in test_recs.items():
         for product in product_list:
+            
+            if recommendations.get(user) is None:
+                count_none += 1
+                continue
+
             rec_rank = 0
             if product in recommendations.get(user):
                 rec_rank = 1/((recommendations.get(user).tolist().index(product)+1)/scaling_factor)
@@ -96,6 +116,9 @@ def mmr(test_recs, recommendations, scaling_factor = 1):
                 rec_rank = 1/(recommendations.get(user).size+1)
             agg_rec_rank += rec_rank
             total += 1
+
+    if count_none > 0:
+        print("None existent users in MMR: ", count_none)
 
     return agg_rec_rank/total
 
