@@ -46,7 +46,7 @@ dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['
             'hidden_dim' : model_config['hidden_dim'],
             'out_dim': model_config['output_dim']}
 
-saved_model = torch.load(f"{BASE_DIR}/graph_files_subgraph/trained_model.pth")
+saved_model = torch.load(f"{BASE_DIR}/graph_files_subgraph/trained_model.pth", weights_only=True)
 
 mpnn_model = ConvModel(ecommerce_hetero_graph_subgraph, model_config['num_layers'], dim_dict, aggregator_type=model_config['aggregate_fn'], pred=model_config['pred'])
 mpnn_model.load_state_dict(saved_model['model_state_dict'])
