@@ -98,7 +98,7 @@ for e in valid_g.edata[dgl.EID].keys():
 
 valid_dataloader = dgl.dataloading.DataLoader(ecommerce_hetero_graph_subgraph, valid_eids_dict, edge_sampler,  shuffle=True, drop_last= False, batch_size=1024, num_workers=0)
 
-train_embeddings = {ntype: torch.zeros(valid_g.num_nodes(ntype), dim_dict['out_dim'])
+train_embeddings = {ntype: torch.zeros(valid_g.num_nodes(ntype), dim_dict['out_dim']).detach()
          for ntype in valid_g.ntypes}
 
 batch, num_batches = 0, len(valid_dataloader)
