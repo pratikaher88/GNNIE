@@ -98,8 +98,8 @@ for e in valid_g.edata[dgl.EID].keys():
 
 valid_dataloader = dgl.dataloading.DataLoader(ecommerce_hetero_graph_subgraph, valid_eids_dict, edge_sampler,  shuffle=True, drop_last= False, batch_size=1024, num_workers=0)
 
-train_embeddings = {ntype: torch.zeros(valid_g.num_nodes(ntype), dim_dict['out_dim'], requires_grad=False)
-         for ntype in valid_g.ntypes}
+# train_embeddings = {ntype: torch.zeros(valid_g.num_nodes(ntype), dim_dict['out_dim'], requires_grad=False)
+#          for ntype in valid_g.ntypes}
 
 batch, num_batches = 0, len(valid_dataloader)
 
@@ -122,21 +122,21 @@ for arg0 , pos_g, neg_g, blocks in valid_dataloader:
     h = mpnn_model.get_repr(blocks, input_features, edge_features_HM)
 
     # print("Output features shape", h['customer'].shape, h['product'].shape)
-    for ntype in h.keys():
-        train_embeddings[ntype][output_nodes[ntype]] = h[ntype].detach()
+    # for ntype in h.keys():
+    #     train_embeddings[ntype][output_nodes[ntype]] = h[ntype].detach()
 
     batch += 1
     
     print(f'batch: {batch} of {num_batches}')
 
 
-import pickle
-with open( f'{BASE_DIR}/graph_files_subgraph/trained_embeddings.pickle', 'wb') as f:
-    pickle.dump(train_embeddings, f, pickle.HIGHEST_PROTOCOL)
+# import pickle
+# with open( f'{BASE_DIR}/graph_files_subgraph/trained_embeddings.pickle', 'wb') as f:
+#     pickle.dump(train_embeddings, f, pickle.HIGHEST_PROTOCOL)
 
-print(train_embeddings['customer'][1].shape, train_embeddings['customer'].shape, train_embeddings['product'].shape)
+# print(train_embeddings['customer'][1].shape, train_embeddings['customer'].shape, train_embeddings['product'].shape)
 
-print('zeros count : ', (train_embeddings['product'][5].shape[0] - torch.count_nonzero(train_embeddings['product'][5])).item(), "out of",train_embeddings['product'][5].shape[0])
+# print('zeros count : ', (train_embeddings['product'][5].shape[0] - torch.count_nonzero(train_embeddings['product'][5])).item(), "out of",train_embeddings['product'][5].shape[0])
 
 # def get_model_recs():
 
