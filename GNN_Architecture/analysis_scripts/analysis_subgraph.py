@@ -176,11 +176,11 @@ model_recommendations = get_model_recs()
 print("Model recs length",len(model_recommendations))
 print("Valid graph length",len(recommendations_from_valid_graph))
 
-with open( f'{BASE_DIR}/graph_files_subgraph/model_recommendations.pickle', 'wb') as f:
-    pickle.dump(model_recommendations, f, pickle.HIGHEST_PROTOCOL)
+# with open( f'{BASE_DIR}/graph_files_subgraph/model_recommendations.pickle', 'wb') as f:
+#     pickle.dump(model_recommendations, f, pickle.HIGHEST_PROTOCOL)
 
-with open( f'{BASE_DIR}/graph_files_subgraph/recommendations_from_valid_graph.pickle', 'wb') as f:
-    pickle.dump(recommendations_from_valid_graph, f, pickle.HIGHEST_PROTOCOL)
+# with open( f'{BASE_DIR}/graph_files_subgraph/recommendations_from_valid_graph.pickle', 'wb') as f:
+#     pickle.dump(recommendations_from_valid_graph, f, pickle.HIGHEST_PROTOCOL)
 
 def compare_rec(ground_truth_recs, model_recs, threshold = 10):
   
