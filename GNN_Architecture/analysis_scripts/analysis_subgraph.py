@@ -123,6 +123,7 @@ for arg0 , pos_g, neg_g, blocks in valid_dataloader:
     
     h = mpnn_model.get_repr(blocks, input_features, edge_features_HM)
 
+    # had to add detach() to avoid memory leak
     h['customer'] = h['customer'].detach()
     h['product'] = h['product'].detach()
 
