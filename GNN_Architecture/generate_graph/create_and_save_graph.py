@@ -204,8 +204,9 @@ ecommerce_hetero_graph.nodes['product'].data['features'] = torch.stack(product_f
 # edge feature assignment
 edge_features = [[float(x), float(y)] for x, y in zip(df_final['price'], df_final['purchase_weekofyear'])]
 print(edge_features[:5])
-ecommerce_hetero_graph.edges['orders'].data['features']= torch.tensor(edge_features).unsqueeze(-1)
-ecommerce_hetero_graph.edges['rev-orders'].data['features']= torch.tensor(edge_features).unsqueeze(-1)
+ecommerce_hetero_graph.edges['orders'].data['features']= torch.tensor(edge_features)
+ecommerce_hetero_graph.edges['rev-orders'].data['features']= torch.tensor(edge_features)
+# REMOVED .unsqueeze(-1) from torch.tensor(edge_features).unsqueeze(-1) as it was giving error
 
 # run validation scripts
 # TODO: error handling in case validation scripts return errors
@@ -218,7 +219,7 @@ ecommerce_hetero_graph.edges['rev-orders'].data['features']= torch.tensor(edge_f
 print(ecommerce_hetero_graph.nodes['product'].data['features'].shape, ecommerce_hetero_graph.nodes['customer'].data['features'].shape)
 print(ecommerce_hetero_graph.edges['orders'].data['features'].shape)
 
-print("SAVE GRAPH !!")
+print(f"SAVED GRAPH AT LOCATION : {BASE_DIR}/{MODEL_DIR}/ecommerce_hetero_graph.dgl")
 dgl.save_graphs(f"{BASE_DIR}/{MODEL_DIR}/ecommerce_hetero_graph.dgl", [ecommerce_hetero_graph])
 
 
