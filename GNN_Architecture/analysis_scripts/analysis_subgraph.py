@@ -177,8 +177,8 @@ model_recommendations = get_model_recs()
 print("Model recs length",len(model_recommendations))
 print("Valid graph length",len(recommendations_from_valid_graph))
 
-# with open( f'{BASE_DIR}/graph_files_subgraph/model_recommendations.pickle', 'wb') as f:
-#     pickle.dump(model_recommendations, f, pickle.HIGHEST_PROTOCOL)
+with open( f'{BASE_DIR}/graph_files_subgraph/model_recommendations.pickle', 'wb') as f:
+    pickle.dump(model_recommendations, f, pickle.HIGHEST_PROTOCOL)
 
 # with open( f'{BASE_DIR}/graph_files_subgraph/recommendations_from_valid_graph.pickle', 'wb') as f:
 #     pickle.dump(recommendations_from_valid_graph, f, pickle.HIGHEST_PROTOCOL)
@@ -216,12 +216,14 @@ baseline_model = baseline_model_generator.generate_popularity_model(ecommerce_he
 # print(model_recommendations[446][:20], len(model_recommendations[446]))
 # print(model_recommendations)
 
+with open( f'{BASE_DIR}/graph_files_subgraph/popularity_baseline.pickle', 'wb') as f:
+    pickle.dump(baseline_model, f, pickle.HIGHEST_PROTOCOL)
 
 
 ## EVALUATION METRICS
 
-random_model = baseline_model_generator.generate_random_model(ecommerce_hetero_graph_subgraph, 'customer', 'product')
-baseline_model = baseline_model_generator.generate_popularity_model(ecommerce_hetero_graph_subgraph, 'orders', 'customer')
+# random_model = baseline_model_generator.generate_random_model(ecommerce_hetero_graph_subgraph, 'customer', 'product')
+# baseline_model = baseline_model_generator.generate_popularity_model(ecommerce_hetero_graph_subgraph, 'orders', 'customer')
 
 print("graph_details: ", graph_details, file=op_file)
 
