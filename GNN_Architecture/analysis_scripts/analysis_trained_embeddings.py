@@ -4,42 +4,35 @@ import torch.nn as nn
 from evaluation import baseline_model_generator
 from collections import defaultdict
 import numpy as np
-import pickle
-from settings import BASE_DIR, CONFIG_PATH
+from settings import BASE_DIR, CONFIG_PATH, MODEL_DIR
 from evaluation.evaluation_metrics import mmr,hit_rate_precision, hit_rate_recall, rbo
+import matplotlib.pyplot as plt
+import random, pickle
 
-# Function to load yaml configuration file
-print("2",BASE_DIR)
-print("3",CONFIG_PATH)
+with open("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/run_data/graph_files_subgraph/trained_embeddings.pickle", 'rb') as pickle_file:
+    train_embeddings = pickle.load(pickle_file)
 
 def load_config(config_name):
-    print(os.path.join(f"{CONFIG_PATH}", config_name))
     with open(os.path.join(f"{CONFIG_PATH}", config_name)) as file:
         config = yaml.safe_load(file)
     return config
 
-model_config = load_config("../model_config.yml")
+print("Loading model config")
+model_config = load_config("model_config.yml")
 
-graphs, _ = dgl.load_graphs(f"../run_data/graph_files_subgraph/ecommerce_hetero_graph_subgraph.dgl")
+graph_name = model_config['input_graph_name']
+graph_details = model_config['graph_details']
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/{graph_name}")
 ecommerce_hetero_graph_subgraph = graphs[0]
 
-graphs, _ = dgl.load_graphs(f"../run_data/graph_files_subgraph/train_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/train_g.dgl")
 train_g = graphs[0]
 
-graphs, _ = dgl.load_graphs(f"../run_data/graph_files_subgraph/test_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/test_g.dgl")
 test_g = graphs[0]
 
-graphs, _ = dgl.load_graphs(f"../run_data/graph_files_subgraph/valid_g.dgl")
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/valid_g.dgl")
 valid_g = graphs[0]
-
-dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['features'].shape[1],
-            'product': ecommerce_hetero_graph_subgraph.nodes['product'].data['features'].shape[1],
-            'edge_dim': ecommerce_hetero_graph_subgraph.edges['orders'].data['features'].shape[1],
-            'edge_hidden_dim': model_config['edge_hidden_dim'],
-            'hidden_dim' : model_config['hidden_dim'],
-            'out_dim': model_config['output_dim']}
-
-saved_model = torch.load(f"../run_data/graph_files_subgraph/trained_model.pth")
 
 def get_ground_truth_recs(g):
 
@@ -52,15 +45,6 @@ def get_ground_truth_recs(g):
     
     return {customer: list(set(products)) for customer, products in test_rated_dict.items()}
 
-recommendations_from_valid_graph = get_ground_truth_recs(valid_g)
-
-with open(f"../run_data/graph_files_subgraph/trained_embeddings.pickle", 'rb') as pickle_file:
-    train_embeddings = pickle.load(pickle_file)
-
-print(train_embeddings['customer'][1].shape, train_embeddings['customer'].shape, train_embeddings['product'].shape)
-
-print('zeros count : ', (train_embeddings['product'][5].shape[0] - torch.count_nonzero(train_embeddings['product'][5])).item(), "out of",train_embeddings['product'][5].shape[0])
-
 def get_model_recs():
 
     user_ids = valid_g.num_nodes('customer')
@@ -69,7 +53,7 @@ def get_model_recs():
 
     for user in range(user_ids):
 
-        user_emb = train_embeddings['customer'][user]
+        user_emb = train_embeddings['customer'][user].detach()
         # user_emb_rpt = torch.cat(valid_g.num_nodes('product')*[user_emb]).reshape(-1, dim_dict['out_dim'])
         user_emb_rpt = user_emb.repeat(valid_g.num_nodes('product'), 1)
 
@@ -84,18 +68,54 @@ def get_model_recs():
         # order = [item for item in order if item not in already_rated]
         
         recs[user] = order
+
+        if user % 10000 == 0:
+            print(user)
     
     return recs
 
 # print(recs)
 
+print("Valid g :", valid_g)
+
+print("Getting model recs start")
 model_recommendations = get_model_recs()
+print("Getting model recs end")
+recommendations_from_valid_graph = get_ground_truth_recs(valid_g)
+print("Getting ground truth recs")
 
 print("Model recs length",len(model_recommendations))
 print("Valid graph length",len(recommendations_from_valid_graph))
 
+
+def compare_rec(ground_truth_recs, model_recs, threshold = 10):
+  
+  total = 0
+  correct = 0 
+
+  for key, value in ground_truth_recs.items():
+
+    model_recs_list = model_recs[key][:10]
+    ground_truth_recs_list = ground_truth_recs[key]
+
+    recommended_movies_correct = list(set(model_recs_list) & set(ground_truth_recs_list))
+
+    if len(set(ground_truth_recs_list)) > 0:
+
+        # if len(recommended_movies_correct) >= 2:
+        print("User ID", key, "Correctly predicted movies", recommended_movies_correct)
+        print("Total test values", len(recommended_movies_correct), "out of", len(set(ground_truth_recs_list)))
+    
+        correct += len(recommended_movies_correct)
+        total += len(set(ground_truth_recs_list))
+
+  return correct, total
+
+
 # use thif function to see actual recommendations
-# print(compare_rec(recommendations_from_valid_graph, model_recommendations))
+print(compare_rec(recommendations_from_valid_graph, model_recommendations))
+
+exit;
 
 random_model = baseline_model_generator.generate_random_model(ecommerce_hetero_graph_subgraph, 'customer', 'product')
 baseline_model = baseline_model_generator.generate_popularity_model(ecommerce_hetero_graph_subgraph, 'orders', 'customer')
@@ -104,17 +124,93 @@ baseline_model = baseline_model_generator.generate_popularity_model(ecommerce_he
 # print(model_recommendations)
 
 
-print("MMR Baseline: ", mmr(recommendations_from_valid_graph, baseline_model, 1))
-print("MMR Random: ", mmr(recommendations_from_valid_graph, random_model, 1))
-print("MMR GNN Model: ", mmr(recommendations_from_valid_graph, model_recommendations, 1))
 
-thresholds = [5,15,30]
+## EVALUATION METRICS
+
+random_model = baseline_model_generator.generate_random_model(ecommerce_hetero_graph_subgraph, 'customer', 'product')
+baseline_model = baseline_model_generator.generate_popularity_model(ecommerce_hetero_graph_subgraph, 'orders', 'customer')
+
+print("graph_details: ", graph_details)
+print(len(random_model))
+print(len(baseline_model))
+
+#MRR
+print("MRR Popular: ", mmr(recommendations_from_valid_graph, baseline_model, 1))
+print("MRR Random: ", mmr(recommendations_from_valid_graph, random_model, 1))
+print("MRR GNN Model: ", mmr(recommendations_from_valid_graph, model_recommendations, 1))
+
+#HIT RATES
+thresholds = [5,10,15,20,25,30,35,40,45,50]
+
+hit_rates_prec_baseline = []
+hit_rates_prec_random = []
+hit_rates_prec_model = []
+
+hit_rates_recall_baseline = []
+hit_rates_recall_random = []
+hit_rates_recall_model = []
 
 for t in thresholds:
-    print('K=',t)
-    print('HR-precision popularity: ', round(hit_rate_precision(recommendations_from_valid_graph, baseline_model, t),5))
-    print('HR-precision random: ', round(hit_rate_precision(recommendations_from_valid_graph, random_model, t),5))
-    print('HR-precision GNNIE: ', round(hit_rate_precision(recommendations_from_valid_graph, model_recommendations, t),5))
-    print('HR-recall popularity: ', round(hit_rate_recall(recommendations_from_valid_graph, baseline_model, t),5))
-    print('HR-recall random: ', round(hit_rate_recall(recommendations_from_valid_graph, random_model, t),5))
-    print('HR-recall GNNIE: ', round(hit_rate_recall(recommendations_from_valid_graph, model_recommendations, t),5))
+    hit_rates_prec_baseline.append(hit_rate_precision(recommendations_from_valid_graph, baseline_model, t))
+    hit_rates_prec_random.append(hit_rate_precision(recommendations_from_valid_graph, random_model, t))
+    hit_rates_prec_model.append(hit_rate_precision(recommendations_from_valid_graph, model_recommendations, t))
+    hit_rates_recall_baseline.append(hit_rate_recall(recommendations_from_valid_graph, baseline_model, t))
+    hit_rates_recall_random.append(hit_rate_recall(recommendations_from_valid_graph, random_model, t))
+    hit_rates_recall_model.append(hit_rate_recall(recommendations_from_valid_graph, model_recommendations, t))
+    
+fig = plt.figure()
+plt.plot(thresholds,hit_rates_prec_baseline, label = "Popularity Model")
+plt.plot(thresholds,hit_rates_prec_random, label = "Random Model")
+plt.plot(thresholds,hit_rates_prec_model, label = "GNNIE Model")
+plt.legend()
+plt.xlabel("# Recs per Customer")
+plt.ylabel("Hit Rate")
+plt.title(f"Hit Rate Precision Performance: {graph_details}")
+fig.savefig(f'{BASE_DIR}/{MODEL_DIR}/hit_rate_precision.png', dpi=fig.dpi)
+
+fig = plt.figure()
+plt.plot(thresholds,hit_rates_recall_baseline, label = "Popularity Model")
+plt.plot(thresholds,hit_rates_recall_random, label = "Random Model")
+plt.plot(thresholds,hit_rates_recall_model, label = "GNNIE Model")
+plt.legend()
+plt.xlabel("# Recs per Customer")
+plt.ylabel("Hit Rate")
+plt.title(f"Hit Rate Recall Performance : {graph_details}")
+fig.savefig(f'{BASE_DIR}/{MODEL_DIR}/hit_rate_recall.png', dpi=fig.dpi)
+
+
+#RBO
+
+# Popular vs. Random
+rbo_scores_5 = []
+rbo_scores_15 = []
+rbo_scores_30 = []
+
+recs_sample = random.sample(list(model_recommendations.items()), 2000)
+
+for i in range(0,len(recs_sample)):
+    rbo_scores_5.append(rbo(baseline_model[0][0:100],random.sample(list(random_model[0]), 100),0.76))
+    rbo_scores_15.append(rbo(baseline_model[0][0:100],random.sample(list(random_model[0]), 100),0.9165))
+    rbo_scores_30.append(rbo(baseline_model[0][0:100],random.sample(list(random_model[0]), 100),0.9578))
+    
+print("Random-Popularity RBO giving 90% weight to first 5 recs: ", sum(rbo_scores_5) / len(rbo_scores_5))
+print("Random-Popularity RBO giving 90% weight to first 15 recs: ", sum(rbo_scores_15) / len(rbo_scores_15))
+print("Random-Popularity RBO giving 90% weight to first 30 recs: ", sum(rbo_scores_30) / len(rbo_scores_30))
+
+
+# Popular vs. GNNIE
+rbo_scores_5 = []
+rbo_scores_15 = []
+rbo_scores_30 = []
+
+recs_sample = random.sample(list(model_recommendations.items()), 2000)
+
+for i in range(0,len(recs_sample)):
+    rbo_scores_5.append(rbo(baseline_model[0][0:100],recs_sample[i][1][0:100],0.76))
+    rbo_scores_15.append(rbo(baseline_model[0][0:100],recs_sample[i][1][0:100],0.9165))
+    rbo_scores_30.append(rbo(baseline_model[0][0:100],recs_sample[i][1][0:100],0.9578))
+
+print("GNNIE-Popularity RBO giving 90% weight to first 5 recs: ", sum(rbo_scores_5) / len(rbo_scores_5))
+print("GNNIE-Popularity RBO giving 90% weight to first 15 recs: ", sum(rbo_scores_15) / len(rbo_scores_15))
+print("GNNIE-Popularity RBO giving 90% weight to first 30 recs: ", sum(rbo_scores_30) / len(rbo_scores_30))
+

@@ -6,3 +6,11 @@ GNN_Architecture/__pycache__/
 **/__pycache__
 
 *.pyc
+
+*.egg
+*.egg-info
+*.bv
+*.pyc
+build
+__pycache__
+eggs

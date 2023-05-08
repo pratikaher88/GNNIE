@@ -1,13 +1,25 @@
 
-import dgl, random, copy, torch
+import dgl, random, copy, torch, os
 import numpy as np
 from typing import List
 from torch import nn
-from settings import BASE_DIR
+# from settings import BASE_DIR
 # from gensim.models import Word2Vec
 
+import argparse
+parser = argparse.ArgumentParser(description='Parse arguments for adding structural features to the graph')
+# parser.add_argument("--remove_duplicates", default=False, help="Remove duplicate product id and customer id combination", type=bool)
+parser.add_argument('--graph_name', help="takes in the name of the graph", type=str, default="ecommerce_hetero_graph")
 
-graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/ecommerce_hetero_graph.dgl")
+args = parser.parse_args()
+
+graph_name = str(args.graph_name)
+
+
+BASE_DIR = os.getcwd()
+
+print("BASE_DIR: ", BASE_DIR)
+graphs, _ = dgl.load_graphs(f"{BASE_DIR}/run_data/graph_files_subgraph/{graph_name}.dgl")
 ecommerce_hetero_graph = graphs[0]
 
 
@@ -293,6 +305,6 @@ structural_feature_tensors = concat_feature_tensors(node_types=["customer","prod
 ecommerce_hetero_graph_clean = add_features_to_graph(ecommerce_hetero_graph, structural_feature_tensors)
 
 
-print("Saving graph!")
-dgl.save_graphs(f"{BASE_DIR}/graph_files_subgraph/ecommerce_hetero_graph_with_sf.dgl", [ecommerce_hetero_graph_clean])
+print("Saving graph! at location :", f"{BASE_DIR}/run_data/graph_files_subgraph/ecommerce_hetero_graph_with_sf.dgl")
+dgl.save_graphs(f"{BASE_DIR}/run_data/graph_files_subgraph/ecommerce_hetero_graph_with_sf.dgl", [ecommerce_hetero_graph_clean])
 

@@ -52,7 +52,9 @@ mpnn_model = ConvModel(ecommerce_hetero_graph_subgraph, model_config['num_layers
 mpnn_model.load_state_dict(saved_model['model_state_dict'])
 mpnn_model.eval()
 
-print(f"Validating model : {valid_g}", file=op_file)
+print(model_config)
+
+print(f"Validating model : {valid_g}",)
 
 from collections import defaultdict
 
@@ -98,7 +100,7 @@ for e in valid_g.edata[dgl.EID].keys():
 
 valid_dataloader = dgl.dataloading.DataLoader(ecommerce_hetero_graph_subgraph, valid_eids_dict, edge_sampler,  shuffle=True, drop_last= False, batch_size=1024, num_workers=0)
 
-train_embeddings = {ntype: torch.zeros(valid_g.num_nodes(ntype), dim_dict['out_dim'])
+train_embeddings = {ntype: torch.zeros(valid_g.num_nodes(ntype), dim_dict['out_dim'], requires_grad=False)
          for ntype in valid_g.ntypes}
 
 batch, num_batches = 0, len(valid_dataloader)
@@ -120,6 +122,10 @@ for arg0 , pos_g, neg_g, blocks in valid_dataloader:
     # print("Input features shape", input_features['customer'].shape, input_features['product'].shape)
     
     h = mpnn_model.get_repr(blocks, input_features, edge_features_HM)
+
+    # had to add detach() to avoid memory leak
+    h['customer'] = h['customer'].detach()
+    h['product'] = h['product'].detach()
 
     # print("Output features shape", h['customer'].shape, h['product'].shape)
     for ntype in h.keys():
@@ -171,6 +177,11 @@ model_recommendations = get_model_recs()
 print("Model recs length",len(model_recommendations))
 print("Valid graph length",len(recommendations_from_valid_graph))
 
+with open( f'{BASE_DIR}/graph_files_subgraph/model_recommendations.pickle', 'wb') as f:
+    pickle.dump(model_recommendations, f, pickle.HIGHEST_PROTOCOL)
+
+# with open( f'{BASE_DIR}/graph_files_subgraph/recommendations_from_valid_graph.pickle', 'wb') as f:
+#     pickle.dump(recommendations_from_valid_graph, f, pickle.HIGHEST_PROTOCOL)
 
 def compare_rec(ground_truth_recs, model_recs, threshold = 10):
   
@@ -205,12 +216,14 @@ baseline_model = baseline_model_generator.generate_popularity_model(ecommerce_he
 # print(model_recommendations[446][:20], len(model_recommendations[446]))
 # print(model_recommendations)
 
+with open( f'{BASE_DIR}/graph_files_subgraph/popularity_baseline.pickle', 'wb') as f:
+    pickle.dump(baseline_model, f, pickle.HIGHEST_PROTOCOL)
 
 
 ## EVALUATION METRICS
 
-random_model = baseline_model_generator.generate_random_model(ecommerce_hetero_graph_subgraph, 'customer', 'product')
-baseline_model = baseline_model_generator.generate_popularity_model(ecommerce_hetero_graph_subgraph, 'orders', 'customer')
+# random_model = baseline_model_generator.generate_random_model(ecommerce_hetero_graph_subgraph, 'customer', 'product')
+# baseline_model = baseline_model_generator.generate_popularity_model(ecommerce_hetero_graph_subgraph, 'orders', 'customer')
 
 print("graph_details: ", graph_details, file=op_file)
 
