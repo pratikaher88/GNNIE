@@ -1,0 +1,37 @@
+Number of recommendations in valid graph : 980
+Number of recommendations in valid graph : 980
+Number of recommendations in valid graph : 980
+Number of recommendations in valid graph : 980
+Number of recommendations in valid graph : 980
+graph_details:  graph with structural features
+MRR Popular:  0.15463527722764572
+MRR Random:  0.009127403685456168
+MRR GNN Model:  0.013748325458395395
+Random-Popularity RBO giving 90% weight to first 5 recs:  0.010290794325355842
+Random-Popularity RBO giving 90% weight to first 15 recs:  0.02612941208468411
+Random-Popularity RBO giving 90% weight to first 30 recs:  0.050944689083280564
+GNNIE-Popularity RBO giving 90% weight to first 5 recs:  0.0012264217717620372
+GNNIE-Popularity RBO giving 90% weight to first 15 recs:  0.023718177198082824
+GNNIE-Popularity RBO giving 90% weight to first 30 recs:  0.05907368581716334
+Number of recommendations in valid graph : 980
+graph_details:  graph with structural features
+MRR Popular:  0.15463527722764572
+MRR Random:  0.009178972930568503
+MRR GNN Model:  0.19044701692275662
+Random-Popularity RBO giving 90% weight to first 5 recs:  0.009581099409878004
+Random-Popularity RBO giving 90% weight to first 15 recs:  0.026347272441843386
+Random-Popularity RBO giving 90% weight to first 30 recs:  0.051047317745391126
+GNNIE-Popularity RBO giving 90% weight to first 5 recs:  0.01858979960116348
+GNNIE-Popularity RBO giving 90% weight to first 15 recs:  0.046814269568616104
+GNNIE-Popularity RBO giving 90% weight to first 30 recs:  0.08157871892044759
+Number of recommendations in valid graph : 980
+graph_details:  graph with structural features
+MRR Popular:  0.15463527722764572
+MRR Random:  0.018957014880528242
+MRR GNN Model:  0.17745671821756384
+Random-Popularity RBO giving 90% weight to first 5 recs:  0.00766319919319946
+Random-Popularity RBO giving 90% weight to first 15 recs:  0.02593976991240379
+Random-Popularity RBO giving 90% weight to first 30 recs:  0.05101494266860186
+GNNIE-Popularity RBO giving 90% weight to first 5 recs:  0.017785403160369823
+GNNIE-Popularity RBO giving 90% weight to first 15 recs:  0.04510312350140471
+GNNIE-Popularity RBO giving 90% weight to first 30 recs:  0.08038212774559197

@@ -1,0 +1,17 @@
+.ipynb_checkpoints/
+.DS_Store
+GNN_Architecture/venv/
+GNN_Architecture/__pycache__/
+
+**/__pycache__
+
+__pycache__/
+*.pyc
+
+*.egg
+*.egg-info
+*.bv
+*.pyc
+build
+__pycache__
+eggs
