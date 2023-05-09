@@ -1,4 +1,4 @@
-import dgl
+import dgl, pickle
 import torch, os
 import pandas as pd
 import numpy as np
@@ -152,6 +152,11 @@ for i, u in enumerate(df_final['customer_id'].unique()):
 # Map the UUIDs to integer IDs using the dictionary
 df_final['customer_id_int'] = df_final['customer_id'].map(uuid_to_int)
 
+# reverse key value pairs of a dictionary   
+
+with open( f'{BASE_DIR}/graph_files_subgraph/customer_uuid_to_int.pickle', 'wb') as f:
+    pickle.dump( uuid_to_int, f, pickle.HIGHEST_PROTOCOL)
+
 import pandas as pd
 import uuid
 
@@ -159,6 +164,9 @@ import uuid
 uuid_to_int = {}
 for i, u in enumerate(df_final['product_id'].unique()):
     uuid_to_int[u] = i
+
+with open( f'{BASE_DIR}/graph_files_subgraph/product_uuid_to_int.pickle', 'wb') as f:
+    pickle.dump( {v: k for k, v in uuid_to_int.items()}, f, pickle.HIGHEST_PROTOCOL)
 
 # Map the UUIDs to integer IDs using the dictionary
 df_final['product_id_int'] = df_final['product_id'].map(uuid_to_int)
@@ -206,6 +214,10 @@ edge_features = [[float(x), float(y)] for x, y in zip(df_final['price'], df_fina
 print(edge_features[:5])
 ecommerce_hetero_graph.edges['orders'].data['features']= torch.tensor(edge_features)
 ecommerce_hetero_graph.edges['rev-orders'].data['features']= torch.tensor(edge_features)
+
+# ecommerce_hetero_graph.edges['orders'].data['features'] = torch.ones((len(edge_features), 1))
+# ecommerce_hetero_graph.edges['rev-orders'].data['features'] = torch.ones((len(edge_features), 1))
+
 # REMOVED .unsqueeze(-1) from torch.tensor(edge_features).unsqueeze(-1) as it was giving error
 
 # run validation scripts

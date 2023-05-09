@@ -1,5 +1,5 @@
 graph_details: "graph with structural features"
-input_graph_name: ecommerce_hetero_graph_with_features.dgl
+input_graph_name: ecommerce_hetero_graph_with_sf.dgl
 aggregate_fn: mean
 delta: 0.5
 n_epochs: 10

@@ -5,8 +5,10 @@ def get_recommendations_combined_with_popularity(rec_list, pop_list, delta = 0, 
     The input is the list of all products along with thier scores not in a sorted order. 
     e.g [100, 20, 120, 200] : this means that product 0 has score 0, product 1 has score 20, product 3 has score 120 and so on.
     '''
-    rec_scores = rec_scores / np.max(rec_list)
-    pop_scores = pop_scores / np.max(pop_list)
+    rec_scores = rec_list / np.max(rec_list)
+    pop_scores = pop_list / np.max(pop_list)
+
+    print(rec_scores.shape, pop_list.shape)
 
     combined_scores = delta*pop_scores + (1-delta)*rec_scores
     p = np.exp(epsilon * combined_scores)
