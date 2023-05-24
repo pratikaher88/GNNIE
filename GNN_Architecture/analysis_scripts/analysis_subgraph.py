@@ -81,10 +81,10 @@ def create_already_rated(g):
         
     return already_rated_dict
 
-already_rated_dict = create_already_rated(train_g)
-recommendations_from_valid_graph = get_ground_truth_recs(valid_g)
+# already_rated_dict = create_already_rated(train_g)
+# recommendations_from_valid_graph = get_ground_truth_recs(valid_g)
 
-print("Number of recommendations in valid graph :", sum(len(value) for value in recommendations_from_valid_graph.values()) , file=op_file)
+# print("Number of recommendations in valid graph :", sum(len(value) for value in recommendations_from_valid_graph.values()) , file=op_file)
 
 neg_sampler = dgl.dataloading.negative_sampler.Uniform(2)
 node_sampler = dgl.dataloading.NeighborSampler(fanouts=[-1, -1])
@@ -175,7 +175,7 @@ def get_model_recs():
 model_recommendations = get_model_recs()
 
 print("Model recs length",len(model_recommendations))
-print("Valid graph length",len(recommendations_from_valid_graph))
+# print("Valid graph length",len(recommendations_from_valid_graph))
 
 with open( f'{BASE_DIR}/graph_files_subgraph/model_recommendations.pickle', 'wb') as f:
     pickle.dump(model_recommendations, f, pickle.HIGHEST_PROTOCOL)
@@ -228,9 +228,9 @@ with open( f'{BASE_DIR}/graph_files_subgraph/popularity_baseline.pickle', 'wb') 
 print("graph_details: ", graph_details, file=op_file)
 
 #MRR
-print("MRR Popular: ", mmr(recommendations_from_valid_graph, baseline_model, 1), file=op_file)
-print("MRR Random: ", mmr(recommendations_from_valid_graph, random_model, 1), file=op_file)
-print("MRR GNN Model: ", mmr(recommendations_from_valid_graph, model_recommendations, 1), file=op_file)
+# print("MRR Popular: ", mmr(recommendations_from_valid_graph, baseline_model, 1), file=op_file)
+# print("MRR Random: ", mmr(recommendations_from_valid_graph, random_model, 1), file=op_file)
+# print("MRR GNN Model: ", mmr(recommendations_from_valid_graph, model_recommendations, 1), file=op_file)
 
 #HIT RATES
 thresholds = [5,10,15,20,25,30,35,40,45,50]
@@ -243,13 +243,13 @@ hit_rates_recall_baseline = []
 hit_rates_recall_random = []
 hit_rates_recall_model = []
 
-for t in thresholds:
-    hit_rates_prec_baseline.append(hit_rate_precision(recommendations_from_valid_graph, baseline_model, t))
-    hit_rates_prec_random.append(hit_rate_precision(recommendations_from_valid_graph, random_model, t))
-    hit_rates_prec_model.append(hit_rate_precision(recommendations_from_valid_graph, model_recommendations, t))
-    hit_rates_recall_baseline.append(hit_rate_recall(recommendations_from_valid_graph, baseline_model, t))
-    hit_rates_recall_random.append(hit_rate_recall(recommendations_from_valid_graph, random_model, t))
-    hit_rates_recall_model.append(hit_rate_recall(recommendations_from_valid_graph, model_recommendations, t))
+# for t in thresholds:
+#     hit_rates_prec_baseline.append(hit_rate_precision(recommendations_from_valid_graph, baseline_model, t))
+#     hit_rates_prec_random.append(hit_rate_precision(recommendations_from_valid_graph, random_model, t))
+#     hit_rates_prec_model.append(hit_rate_precision(recommendations_from_valid_graph, model_recommendations, t))
+#     hit_rates_recall_baseline.append(hit_rate_recall(recommendations_from_valid_graph, baseline_model, t))
+#     hit_rates_recall_random.append(hit_rate_recall(recommendations_from_valid_graph, random_model, t))
+#     hit_rates_recall_model.append(hit_rate_recall(recommendations_from_valid_graph, model_recommendations, t))
     
 fig = plt.figure()
 plt.plot(thresholds,hit_rates_prec_baseline, label = "Popularity Model")
