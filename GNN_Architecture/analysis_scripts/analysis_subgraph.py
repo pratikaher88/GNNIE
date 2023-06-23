@@ -127,6 +127,8 @@ for arg0 , pos_g, neg_g, blocks in valid_dataloader:
     h['customer'] = h['customer'].detach()
     h['product'] = h['product'].detach()
 
+    print(h['customer'].shape)
+
     # print("Output features shape", h['customer'].shape, h['product'].shape)
     for ntype in h.keys():
         train_embeddings[ntype][output_nodes[ntype]] = h[ntype].detach()
