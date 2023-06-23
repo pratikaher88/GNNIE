@@ -118,8 +118,8 @@ for arg0 , pos_g, neg_g, blocks in valid_dataloader:
 
     print(arg0, input_features['customer'].shape, input_features['product'].shape)
     
-    input_features['customer'] = mpnn_model.user_embed(input_features['customer'].detach())
-    input_features['product'] = mpnn_model.item_embed(input_features['product'].detach())
+    input_features['customer'] = mpnn_model.user_embed(input_features['customer'].detach()).detach()
+    input_features['product'] = mpnn_model.item_embed(input_features['product'].detach()).detach()
 
     # print("Input features shape", input_features['customer'].shape, input_features['product'].shape)
     
