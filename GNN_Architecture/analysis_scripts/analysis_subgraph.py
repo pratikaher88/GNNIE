@@ -114,7 +114,7 @@ for arg0 , pos_g, neg_g, blocks in valid_dataloader:
 
     edge_features_HM = {}
     for key, value in edge_features.items():
-        edge_features_HM[key[1]] = (value, ).detach()
+        edge_features_HM[key[1]] = (value.detach(), )
 
     print(arg0, input_features['customer'].shape, input_features['product'].shape)
     
