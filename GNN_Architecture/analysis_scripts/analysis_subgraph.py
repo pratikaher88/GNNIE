@@ -105,37 +105,37 @@ train_embeddings = {ntype: torch.zeros(valid_g.num_nodes(ntype), dim_dict['out_d
 
 batch, num_batches = 0, len(valid_dataloader)
 
-for arg0 , pos_g, neg_g, blocks in valid_dataloader:
+# for arg0 , pos_g, neg_g, blocks in valid_dataloader:
 
-    output_nodes = pos_g.ndata[dgl.NID]
+#     output_nodes = pos_g.ndata[dgl.NID]
 
-    input_features = blocks[0].srcdata['features']
-    edge_features = blocks[0].edata['features']
+#     input_features = blocks[0].srcdata['features']
+#     edge_features = blocks[0].edata['features']
 
-    edge_features_HM = {}
-    for key, value in edge_features.items():
-        edge_features_HM[key[1]] = (value, )
+#     edge_features_HM = {}
+#     for key, value in edge_features.items():
+#         edge_features_HM[key[1]] = (value, )
     
-    input_features['customer'] = mpnn_model.user_embed(input_features['customer'])
-    input_features['product'] = mpnn_model.item_embed(input_features['product'])
+#     input_features['customer'] = mpnn_model.user_embed(input_features['customer'])
+#     input_features['product'] = mpnn_model.item_embed(input_features['product'])
 
-    # print("Input features shape", input_features['customer'].shape, input_features['product'].shape)
+#     # print("Input features shape", input_features['customer'].shape, input_features['product'].shape)
     
-    h = mpnn_model.get_repr(blocks, input_features, edge_features_HM)
+#     h = mpnn_model.get_repr(blocks, input_features, edge_features_HM)
 
-    # had to add detach() to avoid memory leak
-    h['customer'] = h['customer'].detach()
-    h['product'] = h['product'].detach()
+#     # had to add detach() to avoid memory leak
+#     h['customer'] = h['customer'].detach()
+#     h['product'] = h['product'].detach()
 
-    print(h['customer'].shape)
+#     print(h['customer'].shape)
 
-    # print("Output features shape", h['customer'].shape, h['product'].shape)
-    for ntype in h.keys():
-        train_embeddings[ntype][output_nodes[ntype]] = h[ntype].detach()
+#     # print("Output features shape", h['customer'].shape, h['product'].shape)
+#     for ntype in h.keys():
+#         train_embeddings[ntype][output_nodes[ntype]] = h[ntype].detach()
 
-    batch += 1
+#     batch += 1
     
-    print(f'batch: {batch} of {num_batches}')
+#     print(f'batch: {batch} of {num_batches}')
 
 
 import pickle
