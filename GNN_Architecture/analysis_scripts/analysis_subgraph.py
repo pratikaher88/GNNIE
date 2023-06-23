@@ -217,6 +217,8 @@ baseline_model = baseline_model_generator.generate_popularity_model(ecommerce_he
 
 # print(model_recommendations[446][:20], len(model_recommendations[446]))
 # print(model_recommendations)
+print(random_model)
+print(baseline_model)
 
 with open( f'{BASE_DIR}/graph_files_subgraph/popularity_baseline.pickle', 'wb') as f:
     pickle.dump(baseline_model, f, pickle.HIGHEST_PROTOCOL)
