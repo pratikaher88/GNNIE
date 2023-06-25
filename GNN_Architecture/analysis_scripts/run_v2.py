@@ -27,7 +27,7 @@ print("NEW RUN", file=op_file)
 
 graph_name = model_config['input_graph_name']
 
-with open("/Users/pratikaher/SPRING23/Capstone/GNN_Architecture/run_data/graph_files_subgraph/trained_embeddings.pickle", 'rb') as pickle_file:
+with open(f'{BASE_DIR}/graph_files_subgraph/trained_embeddings.pickle', 'rb') as pickle_file:
     train_embeddings = pickle.load(pickle_file)
 
 graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/valid_g.dgl")
