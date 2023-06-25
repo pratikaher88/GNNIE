@@ -126,9 +126,9 @@ for i in range(model_config['n_epochs']):
         for key, value in edge_features.items():
             HM[key[1]] = (value, )
         
-        # print("Edge Features shape : ", HM['orders'][0].shape, HM['rev-orders'][0].shape)
-        # print(input_features)
-        # print(len(blocks))
+        print("Edge Features shape : ", HM['orders'][0].shape, HM['rev-orders'][0].shape)
+        print(input_features)
+        print(len(blocks))
 
         _, pos_score, neg_score = model(blocks, input_features, HM, pos_g, neg_g)
         # _, pos_score, neg_score = model(blocks, input_features, edge_features, pos_g, neg_g)
