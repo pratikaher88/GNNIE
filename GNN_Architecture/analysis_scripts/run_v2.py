@@ -180,6 +180,9 @@ plt.ylabel("Hit Rate")
 plt.title(f"Hit Rate Recall Performance : {graph_details}")
 fig.savefig(f'{BASE_DIR}/{MODEL_DIR}/hit_rate_recall.png', dpi=fig.dpi)
 
+print(hit_rates_recall_baseline, file=op_file)
+print(hit_rates_recall_random, file=op_file)
+print(hit_rates_recall_model, file=op_file)
 
 # #RBO
 
