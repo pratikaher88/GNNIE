@@ -130,7 +130,7 @@ for i in range(model_config['n_epochs']):
         # print(input_features)
         # print(len(blocks))
 
-        _, pos_score, neg_score = model(blocks, input_features, HM, pos_g, neg_g)
+        _, pos_score, neg_score = model(blocks, input_features, edge_features, pos_g, neg_g)
 
         loss = max_margin_loss(pos_score, neg_score, delta)
 
