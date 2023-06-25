@@ -113,6 +113,8 @@ for i in range(model_config['n_epochs']):
     total_loss = 0
     batch = 0
 
+    print("Epoch :", i)
+
     for _, pos_g, neg_g, blocks in dataloader:
 
         optimizer.zero_grad()
