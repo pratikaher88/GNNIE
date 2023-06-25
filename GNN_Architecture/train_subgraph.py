@@ -106,6 +106,7 @@ model = ConvModel(ecommerce_hetero_graph_subgraph, model_config['num_layers'], d
 
 optimizer = torch.optim.Adam(model.parameters(), lr=model_config['learning_rate'],weight_decay=0)
 
+print("Training begins")
 
 for i in range(model_config['n_epochs']):
 
