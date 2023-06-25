@@ -81,7 +81,7 @@ edge_sampler = dgl.dataloading.EdgePredictionSampler(
     negative_sampler=neg_sampler,
     exclude='self')
 
-dataloader = dgl.dataloading.DataLoader(train_g, train_eids_dict, 
+dataloader = dgl.dataloading.DataLoader(ecommerce_hetero_graph_subgraph, train_eids_dict, 
                                             edge_sampler,  shuffle=True, 
                                             batch_size=model_config['batch_size'], num_workers=model_config['num_workers'])
 
