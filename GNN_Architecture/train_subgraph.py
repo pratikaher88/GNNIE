@@ -73,7 +73,8 @@ test_g = dgl.edge_subgraph(ecommerce_hetero_graph_subgraph, test_eids_dict, rela
 # dataloader
 
 neg_sampler = dgl.dataloading.negative_sampler.Uniform(2)
-node_sampler = dgl.dataloading.NeighborSampler(fanouts=[-1, -1])
+# node_sampler = dgl.dataloading.NeighborSampler(fanouts=[-1, -1])
+node_sampler = dgl.dataloading.MultiLayerNeighborSampler([1, 1, 1], replace=False)
 
 edge_sampler = dgl.dataloading.EdgePredictionSampler(
     node_sampler,
