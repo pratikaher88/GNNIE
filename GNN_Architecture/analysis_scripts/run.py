@@ -59,7 +59,7 @@ print(model_config)
 print(f"Validating model : {valid_g}",)
 
 neg_sampler = dgl.dataloading.negative_sampler.Uniform(2)
-node_sampler = dgl.dataloading.NeighborSampler(fanouts=[1, 1])
+node_sampler = dgl.dataloading.NeighborSampler(fanouts=[-1, -1])
 
 edge_sampler = dgl.dataloading.EdgePredictionSampler(
     node_sampler,
