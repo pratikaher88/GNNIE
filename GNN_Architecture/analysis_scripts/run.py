@@ -17,11 +17,16 @@ graph_details = model_config['graph_details']
 graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/{graph_name}")
 ecommerce_hetero_graph_subgraph = graphs[0]
 
-print("Ecommerce graph",ecommerce_hetero_graph_subgraph)
+print("Ecommerce graph", ecommerce_hetero_graph_subgraph)
 
-number_of_egdes = model_config['number_of_egdes']
-ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph_subgraph, { 'orders' : list(range(number_of_egdes)), 'rev-orders' : list(range(number_of_egdes)) } )
+# ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph_subgraph, { 'orders' : list(range(number_of_egdes)), 'rev-orders' : list(range(number_of_egdes)) } )
 # ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : [random.randint(1, 10000) for i in range(1000)], 'rev-orders' : [random.randint(1, 10000) for i in range(1000)] } )
+
+if model_config['train_full'] == False:
+    number_of_egdes = model_config['number_of_egdes']
+    ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph_subgraph, { 'orders' : list(range(number_of_egdes)), 'rev-orders' : list(range(number_of_egdes)) } )
+    # ecommerce_hetero_graph_subgraph = dgl.edge_subgraph(ecommerce_hetero_graph, { 'orders' : [random.randint(1, 10000) for i in range(1000)], 'rev-orders' : [random.randint(1, 10000) for i in range(1000)] } )
+
 
 
 neg_sampler = dgl.dataloading.negative_sampler.Uniform(2)
