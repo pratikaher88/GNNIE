@@ -70,9 +70,8 @@ valid_eids_dict = {}
 for e in valid_g.edata[dgl.EID].keys():
     valid_eids_dict[e[1]] = valid_g.edata[dgl.EID][e]
 
-valid_dataloader = dgl.dataloading.DataLoader(ecommerce_hetero_graph_subgraph, valid_eids_dict, edge_sampler,  shuffle=True, drop_last= False, batch_size=1024, num_workers=0)
+valid_dataloader = dgl.dataloading.DataLoader(ecommerce_hetero_graph_subgraph, valid_eids_dict, edge_sampler,  shuffle=True, drop_last= False, batch_size=model_config['batch_size'], num_workers=0)
 
-print(valid_dataloader)
 print(len(valid_dataloader))
 print(next(iter(valid_dataloader)))
 
