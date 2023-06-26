@@ -9,8 +9,6 @@ def load_config(config_name):
         config = yaml.safe_load(file)
     return config
 
-
-
 print("Loading model config")
 model_config = load_config("model_config.yml")
 
@@ -70,7 +68,7 @@ valid_eids_dict = {}
 for e in valid_g.edata[dgl.EID].keys():
     valid_eids_dict[e[1]] = valid_g.edata[dgl.EID][e]
 
-valid_dataloader = dgl.dataloading.DataLoader(ecommerce_hetero_graph_subgraph, valid_eids_dict, edge_sampler,  shuffle=True, batch_size=model_config['batch_size'], num_workers=model_config['num_workers'])
+valid_dataloader = dgl.dataloading.DataLoader(valid_g, valid_eids_dict, edge_sampler,  shuffle=True, batch_size=model_config['batch_size'], num_workers=model_config['num_workers'])
 
 print(valid_eids_dict['orders'].shape, valid_eids_dict['orders'][:100])
 print(next(iter(valid_dataloader)))
