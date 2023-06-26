@@ -54,7 +54,7 @@ mpnn_model = ConvModel(ecommerce_hetero_graph_subgraph, model_config['num_layers
 mpnn_model.load_state_dict(saved_model['model_state_dict'])
 mpnn_model.eval()
 
-print(model_config)
+# print(model_config)
 
 print(f"Validating model : {valid_g}",)
 
