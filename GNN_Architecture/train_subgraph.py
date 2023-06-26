@@ -18,8 +18,9 @@ model_config = load_config("model_config.yml")
 
 np.random.seed(42)
 
-graph_name = model_config['input_graph_name']
+# 
 
+graph_name = model_config['input_graph_name']
 graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/{graph_name}")
 ecommerce_hetero_graph = graphs[0]
 
@@ -27,6 +28,7 @@ ecommerce_hetero_graph = graphs[0]
 # ecommerce_hetero_graph_subgraph = ecommerce_hetero_graph.subgraph({ 'customer' :list(range(1000)), 'product': list(range(ecommerce_hetero_graph.num_nodes('product')))})
 delta =  model_config['delta']
 
+# check if the traijing is for subgraph for full graph
 if model_config['train_full'] == True:
     print("Training on full graph")
     ecommerce_hetero_graph_subgraph = ecommerce_hetero_graph
@@ -51,7 +53,7 @@ dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['
             'out_dim': model_config['output_dim']
            }
 
-# Train test split
+# Divide into Train test split
 
 eids = np.arange(ecommerce_hetero_graph_subgraph.number_of_edges(etype='orders'))
 eids = np.random.permutation(eids)
@@ -70,12 +72,12 @@ train_g = dgl.edge_subgraph(ecommerce_hetero_graph_subgraph, train_eids_dict, re
 valid_g = dgl.edge_subgraph(ecommerce_hetero_graph_subgraph, valid_eids_dict, relabel_nodes=False)
 test_g = dgl.edge_subgraph(ecommerce_hetero_graph_subgraph, test_eids_dict, relabel_nodes=False)
 
-# dataloader
+# dataloader work
 
 neg_sampler = dgl.dataloading.negative_sampler.Uniform(2)
 # node_sampler = dgl.dataloading.NeighborSampler(fanouts=[-1, -1])
 # node_sampler = dgl.dataloading.NeighborSampler(fanouts=[1, 1])
-node_sampler = dgl.dataloading.MultiLayerNeighborSampler([10, 5, 3], replace=False)
+node_sampler = dgl.dataloading.MultiLayerNeighborSampler([int(fanout) for fanout in model_config['fanouts'].split(',') ], replace=False)
 
 edge_sampler = dgl.dataloading.EdgePredictionSampler(
     node_sampler,
@@ -124,17 +126,16 @@ for i in range(model_config['n_epochs']):
         input_features = blocks[0].srcdata['features']
         edge_features = blocks[0].edata['features']
 
-        HM = {}
+        edge_features_HM = {}
         for key, value in edge_features.items():
-            HM[key[1]] = (value, )
+            edge_features_HM[key[1]] = (value, )
         
         # print("Edge Features shape : ", HM['orders'][0].shape, HM['rev-orders'][0].shape)
         # print(input_features['customer'].shape, input_features['product'].shape)
         # print(len(blocks))
 
-        _, pos_score, neg_score = model(blocks, input_features, HM, pos_g, neg_g)
+        _, pos_score, neg_score = model(blocks, input_features, edge_features_HM, pos_g, neg_g)
         # _, pos_score, neg_score = model(blocks, input_features, edge_features, pos_g, neg_g)
-
 
         loss = max_margin_loss(pos_score, neg_score, delta)
 
@@ -151,6 +152,7 @@ for i in range(model_config['n_epochs']):
         # print(f'batch: {batch} of {num_batches}')
     
     print(f'Total loss at epoch {i} :',total_loss)
+    print(f"Time taken so far{time.time() - start}")
 
     torch.save({'epoch': i,
         'model_state_dict': model.state_dict(),
