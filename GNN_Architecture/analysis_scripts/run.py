@@ -59,7 +59,7 @@ mpnn_model.eval()
 print(f"Validating model : {valid_g}",)
 
 neg_sampler = dgl.dataloading.negative_sampler.Uniform(2)
-node_sampler = dgl.dataloading.NeighborSampler(fanouts=[-1, -1])
+node_sampler = dgl.dataloading.NeighborSampler(fanouts=[1, 1])
 
 edge_sampler = dgl.dataloading.EdgePredictionSampler(
     node_sampler,
@@ -73,6 +73,9 @@ for e in valid_g.edata[dgl.EID].keys():
 valid_dataloader = dgl.dataloading.DataLoader(ecommerce_hetero_graph_subgraph, valid_eids_dict, edge_sampler,  shuffle=True, drop_last= False, batch_size=1024, num_workers=0)
 
 print(valid_dataloader)
+print(len(valid_dataloader))
+print(next(iter(valid_dataloader)))
+
 
 train_embeddings = {ntype: torch.zeros(valid_g.num_nodes(ntype), dim_dict['out_dim'], requires_grad=False)
          for ntype in valid_g.ntypes}
