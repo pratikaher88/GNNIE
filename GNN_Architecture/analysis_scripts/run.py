@@ -62,7 +62,8 @@ mpnn_model.eval()
 print(f"Validating model : {valid_g}",)
 
 neg_sampler = dgl.dataloading.negative_sampler.Uniform(2)
-node_sampler = dgl.dataloading.NeighborSampler(fanouts=[1, 1])
+# node_sampler = dgl.dataloading.NeighborSampler(fanouts=[1, 1])
+node_sampler = dgl.dataloading.MultiLayerNeighborSampler([int(fanout) for fanout in model_config['fanouts'].split(',') ], replace=False)
 
 edge_sampler = dgl.dataloading.EdgePredictionSampler(
     node_sampler,
