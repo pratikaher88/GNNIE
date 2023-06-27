@@ -18,8 +18,6 @@ model_config = load_config("model_config.yml")
 
 np.random.seed(42)
 
-# 
-
 graph_name = model_config['input_graph_name']
 graphs, _ = dgl.load_graphs(f"{BASE_DIR}/graph_files_subgraph/{graph_name}")
 ecommerce_hetero_graph = graphs[0]

@@ -87,13 +87,13 @@ class ConvModel(nn.Module):
             # print(edge_features[('customer', 'orders', 'product')].shape, edge_features[('product', 'rev-orders', 'customer')].shape)
 
             # print(blocks[i])
-            HM = {}
+            edge_features_HM = {}
             for key, value in edge_features.items():
-                HM[key[1]] = (value, )
+                edge_features_HM[key[1]] = (value, )
 
             # print(HM['orders'][0].shape, HM['rev-orders'][0].shape)
 
-            h = layer(blocks[i], h, mod_args = HM)
+            h = layer(blocks[i], h, mod_args = edge_features_HM)
 
         return h
     
@@ -114,7 +114,6 @@ class ConvModel(nn.Module):
             h = self.get_repr(blocks, h, edge_features)
 
             # print("H-value", h['customer'].shape, h['product'].shape)
-            # print("graphs", pos_g, neg_g)
 
             pos_score = self.pred_fn(pos_g, h)
             neg_score = self.pred_fn(neg_g, h)
