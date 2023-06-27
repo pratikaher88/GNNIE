@@ -147,7 +147,7 @@ for i in range(model_config['n_epochs']):
 
         batch += 1
 
-        # print(f'batch: {batch} of {num_batches}')
+        print(f'batch: {batch} of {num_batches}')
     
     print(f'Total loss at epoch {i} :',total_loss)
     print(f"Time taken so far{time.time() - start}")
