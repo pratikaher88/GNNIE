@@ -164,7 +164,7 @@ for e in range(model_config['n_epochs']):
     # torch.save(model.state_dict(), 'f"{BASE_DIR}/graph_files/trained_model.pth')
 get_model_size(model)
 
-torch.save({'epoch': i,
+torch.save({'epoch': e,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
         'loss': total_loss}, 
