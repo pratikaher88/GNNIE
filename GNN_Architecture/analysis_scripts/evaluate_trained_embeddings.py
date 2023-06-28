@@ -23,10 +23,10 @@ model_config = load_config("model_config.yml")
 graph_details = model_config['graph_details']
 # op_file = open(f"{BASE_DIR}/{MODEL_DIR}/output.txt", "a")
 
-current_directory = os.getcwd()
+current_directory = os.path.join(os.getcwd(), BASE_DIR)
 
 # Create a new directory
-new_directory = os.path.join(current_directory, datetime.now().strftime('mylogfile_%H_%M_%d_%m_%Y'))
+new_directory = os.path.join(current_directory, datetime.now().strftime('logfile_%H_%M_%d_%m_%Y'))
 os.mkdir(new_directory)
 
 new_file_path = os.path.join(new_directory, 'logfile.log')
