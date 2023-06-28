@@ -33,10 +33,10 @@ new_file_path = os.path.join(new_directory, 'logfile.log')
 
 op_file = open(new_file_path, 'w')
 
-print('-----------------------------------------------')
-print()
-print(model_config)
-print()
+print('-----------------------------------------------',  file=op_file)
+print(file=op_file)
+print(model_config, file=op_file)
+print(file=op_file)
 
 
 graph_name = model_config['input_graph_name']
