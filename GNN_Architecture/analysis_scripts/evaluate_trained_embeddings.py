@@ -22,7 +22,15 @@ model_config = load_config("model_config.yml")
 graph_details = model_config['graph_details']
 # op_file = open(f"{BASE_DIR}/{MODEL_DIR}/output.txt", "a")
 
-op_file = open(datetime.now().strftime('latest_run_%H_%M_%d_%m_%Y.log'), 'w')
+current_directory = os.getcwd()
+
+# Create a new directory
+new_directory = os.path.join(current_directory, 'latest_run_%H_%M_%d_%m_%Y')
+os.mkdir(new_directory)
+
+new_file_path = os.path.join(new_directory, 'logfile.log')
+
+op_file = open(new_file_path, 'w')
 
 print('-----------------------------------------------')
 print()
