@@ -149,12 +149,12 @@ for e in range(model_config['n_epochs']):
 
         # print(f'batch: {batch} of {num_batches}')
     
-    print(f'Total loss at epoch {i} :',total_loss)
+    print(f'Total loss at epoch {e} :',total_loss)
     print(f"Time taken so far : {(time.time() - start) / 60.0 :.2f}")
 
     if e!= 0 and e % 5 == 0:
 
-        torch.save({'epoch': i,
+        torch.save({'epoch': e,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': total_loss}, 
