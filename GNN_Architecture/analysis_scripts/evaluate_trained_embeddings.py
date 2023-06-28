@@ -1,5 +1,6 @@
 from Model.model import ConvModel
-import dgl, torch, os, yaml, datetime
+import dgl, torch, os, yaml
+from datetime import datetime
 import torch.nn as nn
 from evaluation import baseline_model_generator
 from collections import defaultdict
