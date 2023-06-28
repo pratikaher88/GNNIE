@@ -299,7 +299,7 @@ structural_feature_tensors = concat_feature_tensors(node_types=["customer","prod
                                           in_degree=indegree,
                                           out_degree=outdegree,
                                           pagerank=pagerank_op,
-                                          walk_embeddings=embedding_walk,
+                                        #   walk_embeddings=embedding_walk,
                                           )
 
 ecommerce_hetero_graph_clean = add_features_to_graph(ecommerce_hetero_graph, structural_feature_tensors)
