@@ -150,7 +150,7 @@ for i in range(model_config['n_epochs']):
         # print(f'batch: {batch} of {num_batches}')
     
     print(f'Total loss at epoch {i} :',total_loss)
-    print(f"Time taken so far{time.time() - start}")
+    print(f"Time taken so far :{time.time() - start}")
 
     torch.save({'epoch': i,
         'model_state_dict': model.state_dict(),
