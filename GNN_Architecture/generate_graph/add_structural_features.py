@@ -305,6 +305,6 @@ structural_feature_tensors = concat_feature_tensors(node_types=["customer","prod
 ecommerce_hetero_graph_clean = add_features_to_graph(ecommerce_hetero_graph, structural_feature_tensors)
 
 
-print("Saving graph! at location :", f"{BASE_DIR}/run_data/graph_files_subgraph/ecommerce_hetero_graph_with_sf.dgl")
-dgl.save_graphs(f"{BASE_DIR}/run_data/graph_files_subgraph/ecommerce_hetero_graph_with_sf.dgl", [ecommerce_hetero_graph_clean])
+print("Saving graph! at location :", f"{BASE_DIR}/run_data/graph_files_subgraph/{graph_name}_with_sf.dgl")
+dgl.save_graphs(f"{BASE_DIR}/run_data/graph_files_subgraph/{graph_name}_with_sf.dgl", [ecommerce_hetero_graph_clean])
 
