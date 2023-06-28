@@ -110,12 +110,12 @@ optimizer = torch.optim.Adam(model.parameters(), lr=model_config['learning_rate'
 
 print("Training begins")
 
-for i in range(model_config['n_epochs']):
+for e in range(model_config['n_epochs']):
 
     total_loss = 0
     batch = 0
 
-    print("Epoch :", i)
+    print("Epoch :", e)
 
     for _, pos_g, neg_g, blocks in dataloader:
 
@@ -152,11 +152,13 @@ for i in range(model_config['n_epochs']):
     print(f'Total loss at epoch {i} :',total_loss)
     print(f"Time taken so far : {(time.time() - start) / 60.0 :.2f}")
 
-    torch.save({'epoch': i,
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-        'loss': total_loss}, 
-        f'{BASE_DIR}/graph_files_subgraph/trained_model.pth')
+    if e!= 0 and e % 5 == 0:
+
+        torch.save({'epoch': i,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'loss': total_loss}, 
+            f'{BASE_DIR}/graph_files_subgraph/trained_model.pth')
 
     # torch.save(model, 'mpnn_model_save.pth')
     # torch.save(model.state_dict(), 'f"{BASE_DIR}/graph_files/trained_model.pth')
