@@ -25,7 +25,7 @@ graph_details = model_config['graph_details']
 current_directory = os.getcwd()
 
 # Create a new directory
-new_directory = os.path.join(current_directory, 'latest_run_%H_%M_%d_%m_%Y')
+new_directory = os.path.join(current_directory, datetime.now().strftime('mylogfile_%H_%M_%d_%m_%Y'))
 os.mkdir(new_directory)
 
 new_file_path = os.path.join(new_directory, 'logfile.log')
