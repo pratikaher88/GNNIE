@@ -81,6 +81,8 @@ def get_model_recs():
 model_recommendations = get_model_recs()
 
 print("Model recs length",len(model_recommendations))
+print("Sample model rec", model_recommendations[0])
+
 # print("Valid graph length",len(recommendations_from_valid_graph))
 
 # with open( f'{BASE_DIR}/graph_files_subgraph/model_recommendations.pickle', 'wb') as f:
