@@ -1,5 +1,5 @@
 from Model.model import ConvModel
-import dgl, torch, os, yaml
+import dgl, torch, os, yaml, datetime
 import torch.nn as nn
 from evaluation import baseline_model_generator
 from collections import defaultdict
@@ -20,9 +20,14 @@ def load_config(config_name):
 print("Loading model config")
 model_config = load_config("model_config.yml")
 graph_details = model_config['graph_details']
-op_file = open(f"{BASE_DIR}/{MODEL_DIR}/output.txt", "a")
+# op_file = open(f"{BASE_DIR}/{MODEL_DIR}/output.txt", "a")
 
-print("NEW RUN", file=op_file)
+op_file = open(datetime.now().strftime('latest_run_%H_%M_%d_%m_%Y.log'), 'w')
+
+print('-----------------------------------------------')
+print()
+print(model_config)
+print()
 
 
 graph_name = model_config['input_graph_name']

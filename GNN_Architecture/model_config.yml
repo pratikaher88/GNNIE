@@ -15,3 +15,4 @@ fanouts: "10,5,3"
 num_workers: 0
 number_of_egdes: 50000
 train_full: True
+goal: "we are testing some strategies in this run"

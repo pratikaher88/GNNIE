@@ -295,6 +295,7 @@ pagerank_op = pagerank(ecommerce_hetero_graph,
 indegree = indegree_feature(ecommerce_hetero_graph)
 outdegree = outdegree_feature(ecommerce_hetero_graph)
 
+# REMOVED SOME STRCTURAL FEATURES
 structural_feature_tensors = concat_feature_tensors(node_types=["customer","product"], 
                                           in_degree=indegree,
                                           out_degree=outdegree,
