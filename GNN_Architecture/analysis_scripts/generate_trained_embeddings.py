@@ -108,7 +108,8 @@ for _ , pos_g, neg_g, blocks in valid_dataloader:
     # print("Input features shape", input_features, input_features['customer'].shape, input_features['product'].shape)
     # print("Edge features", edge_features_HM['orders'][0].shape, edge_features_HM['rev-orders'][0].shape)
     
-    h = mpnn_model.get_repr(blocks, input_features, edge_features_HM)
+    h = mpnn_model.get_repr(blocks, input_features)
+    # h = mpnn_model.get_repr(blocks, input_features, edge_features_HM)
 
     h['customer'] = h['customer'].detach()
     h['product'] = h['product'].detach()

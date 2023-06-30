@@ -50,12 +50,9 @@ class CosinePredictionWihEdge(nn.Module):
         edge_features = graph.edata['features']
         edge_features_HM = {}
         for key, value in edge_features.items():
-            # print(key, value[0].shape)
             edge_features_HM[key[1]] = value
 
         # print('-------------')
-
-        # print()
 
         with graph.local_scope():
             for etype in graph.canonical_etypes:
@@ -66,8 +63,10 @@ class CosinePredictionWihEdge(nn.Module):
 
                 utype, mtype, vtype = etype
                 src_nid, dst_nid = graph.all_edges(etype=etype)
-                emb_heads = h[utype][src_nid]
-                emb_tails = h[vtype][dst_nid]
+                emb_heads = F.normalize(h[utype][src_nid], p=2, dim=-1)
+                emb_tails = F.normalize(h[utype][src_nid], p=2, dim=-1)
+                # emb_heads = h[utype][src_nid] 
+                # emb_tails = h[vtype][dst_nid]
 
                 # edge_emb = graph.edata['features'][('customer', 'orders', 'product')].shape
                 # print(h[utype].shape)
