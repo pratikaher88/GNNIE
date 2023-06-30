@@ -35,8 +35,8 @@ class CosinePredictionWihEdge(nn.Module):
         
         self.dim_dict = dim_dict
         self.orders_edge_dim = orders_edge_dim
-        self.hidden_1 = nn.Linear(embed_dim * 2 + orders_edge_dim, 64)
-        self.hidden_2 = nn.Linear(64, 32)
+        self.hidden_1 = nn.Linear(embed_dim * 2 + orders_edge_dim, 32)
+        # self.hidden_2 = nn.Linear(64, 32)
         self.output = nn.Linear(32, 1)
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
@@ -81,8 +81,8 @@ class CosinePredictionWihEdge(nn.Module):
                 # print("embedding shape", emb_heads.shape, pos_graph, cat_embed.shape, edge_emb.shape)
                 x = self.hidden_1(cat_embed)
                 x = self.relu(x)
-                x = self.hidden_2(x)
-                x = self.relu(x)
+                # x = self.hidden_2(x)
+                # x = self.relu(x)
                 x = self.output(x)
                 # x = self.sigmoid(x)
                 
