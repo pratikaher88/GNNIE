@@ -13,7 +13,7 @@ class CosinePrediction(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, graph, h):
+    def forward(self, graph, h, pos_graph = False):
         # print("input graph :", graph)
         with graph.local_scope():
             for etype in graph.canonical_etypes:
@@ -24,8 +24,92 @@ class CosinePrediction(nn.Module):
                 except KeyError:
                     pass  # For etypes that are not in training eids, thus have no 'h'
             ratings = graph.edata['cos']
+
+        # print("ratings", ratings)
         return ratings
 
+class CosinePredictionWihEdge(nn.Module):
+
+    def __init__(self, dim_dict, embed_dim, orders_edge_dim, rev_orders_edge_dim):
+        super().__init__()
+        
+        self.dim_dict = dim_dict
+        self.orders_edge_dim = orders_edge_dim
+        self.hidden_1 = nn.Linear(embed_dim * 2 + orders_edge_dim, 128)
+        self.hidden_2 = nn.Linear(128, 32)
+        self.output = nn.Linear(32, 1)
+        self.relu = nn.ReLU()
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, graph, h, pos_graph):
+        # print("input graph :", graph)
+
+        result = {}
+        # print("Graph edata shape", graph.edata['features'][('customer', 'orders', 'product')].shape)
+
+        edge_features = graph.edata['features']
+        edge_features_HM = {}
+        for key, value in edge_features.items():
+            # print(key, value[0].shape)
+            edge_features_HM[key[1]] = value
+
+        # print('-------------')
+
+        # print()
+
+        with graph.local_scope():
+            for etype in graph.canonical_etypes:
+                # try:
+                    # graph.nodes[etype[0]].data['norm_h'] = F.normalize(h[etype[0]], p=2, dim=-1)
+                    # graph.nodes[etype[2]].data['norm_h'] = F.normalize(h[etype[2]], p=2, dim=-1)
+                    # graph.apply_edges(fn.u_dot_v('norm_h', 'norm_h', 'cos'), etype=etype)
+
+                utype, mtype, vtype = etype
+                src_nid, dst_nid = graph.all_edges(etype=etype)
+                emb_heads = h[utype][src_nid]
+                emb_tails = h[vtype][dst_nid]
+
+                # edge_emb = graph.edata['features'][('customer', 'orders', 'product')].shape
+                # print(h[utype].shape)
+
+                if not pos_graph:
+                    edge_emb = torch.randn(emb_heads.shape[0], self.orders_edge_dim)
+                else:
+                    edge_emb = edge_features_HM[mtype]
+
+                cat_embed = torch.cat((emb_heads, emb_tails, edge_emb), 1)
+
+                # print("embedding shape", emb_heads.shape, pos_graph, cat_embed.shape, edge_emb.shape)
+                x = self.hidden_1(cat_embed)
+                x = self.relu(x)
+                x = self.hidden_2(x)
+                x = self.relu(x)
+                x = self.output(x)
+                x = self.sigmoid(x)
+                
+                # print(x.shape)
+                result[etype] = x
+
+                # x = self.hidden_1(cat_embed)
+                # x = self.relu(x)
+                # x = self.hidden_2(x)
+                # x = self.relu(x)
+                # x = self.output(x)
+                # x = self.sigmoid(x)
+                # return x
+
+                # A =  F.normalize(h[etype[0]], p=2, dim=-1)
+                # B =  F.normalize(h[etype[2]], p=2, dim=-1)
+                
+                # C = edge_features[etype[1]][0]
+
+                # print("Edge values", A.shape, B.shape, C.shape)
+
+                
+                # except KeyError:
+                #     pass  # For etypes that are not in training eids, thus have no 'h'
+            # ratings = graph.edata['cos']
+        return result
 
 class PredictingLayer(nn.Module):
     """

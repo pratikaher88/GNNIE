@@ -1,7 +1,7 @@
 import torch.nn as nn
 import dgl.nn.pytorch as dglnn
 from Model.layer import ConvLayer
-from Model.prediction import CosinePrediction, PredictingModule, PredictingLayer, Cosine_PredictingModule, Cosine_PredictingLayer
+from Model.prediction import CosinePrediction, PredictingModule, PredictingLayer, Cosine_PredictingModule, Cosine_PredictingLayer, CosinePredictionWihEdge
 
 class NodeEmbedding(nn.Module):
     """
@@ -68,13 +68,15 @@ class ConvModel(nn.Module):
             self.pred_fn = PredictingModule(dim_dict['out_dim'])
         elif pred == 'cos_nn':
             self.pred_fn = Cosine_PredictingModule(dim_dict['out_dim'])
+        elif pred == 'exp_cos':
+            self.pred_fn = CosinePredictionWihEdge(dim_dict, dim_dict['out_dim'], dim_dict['orders']['edge_dim'], dim_dict['rev-orders']['edge_dim'])
         else:
             print("prediction function has not been specified!")
 
     def get_repr(self,
                  blocks,
-                 h,
-                 edge_features):
+                 h):
+                #  edge_features):
 
         # print("Edge features", edge_features['orders'].shape)
         
@@ -111,11 +113,12 @@ class ConvModel(nn.Module):
             h['customer'] = self.user_embed(h['customer'])
             h['product'] = self.item_embed(h['product'])
 
-            h = self.get_repr(blocks, h, edge_features)
+            # h = self.get_repr(blocks, h, edge_features)
+            h = self.get_repr(blocks, h)
 
             # print("H-value", h['customer'].shape, h['product'].shape)
 
-            pos_score = self.pred_fn(pos_g, h)
-            neg_score = self.pred_fn(neg_g, h)
+            pos_score = self.pred_fn(pos_g, h, pos_graph = True)
+            neg_score = self.pred_fn(neg_g, h, pos_graph = False)
 
             return h, pos_score, neg_score

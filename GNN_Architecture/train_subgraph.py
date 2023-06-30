@@ -128,8 +128,8 @@ for e in range(model_config['n_epochs']):
         for key, value in edge_features.items():
             edge_features_HM[key[1]] = (value, )
         
-        # print("Edge Features shape : ", HM['orders'][0].shape, HM['rev-orders'][0].shape)
-        # print(input_features['customer'].shape, input_features['product'].shape)
+        # print("Edge Features shape : ", edge_features_HM['orders'][0].shape, edge_features_HM['rev-orders'][0].shape)
+        # print("Input Features shape : ", input_features['customer'].shape, input_features['product'].shape)
         # print(len(blocks))
 
         _, pos_score, neg_score = model(blocks, input_features, edge_features_HM, pos_g, neg_g)
