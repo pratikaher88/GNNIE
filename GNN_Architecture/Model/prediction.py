@@ -28,18 +28,34 @@ class CosinePrediction(nn.Module):
         # print("ratings", ratings)
         return ratings
 
-class CosinePredictionWihEdge(nn.Module):
-
-    def __init__(self, dim_dict, embed_dim, orders_edge_dim, rev_orders_edge_dim):
+class CosinePredictionWihEdgeLayer(nn.Module):
+    def __init__(self, embed_dim, edge_dim):
         super().__init__()
-        
-        self.dim_dict = dim_dict
-        self.orders_edge_dim = orders_edge_dim
-        self.hidden_1 = nn.Linear(embed_dim * 2 + orders_edge_dim, 32)
-        # self.hidden_2 = nn.Linear(64, 32)
+        self.hidden_1 = nn.Linear(embed_dim * 2 + edge_dim, 64)
+        self.hidden_2 = nn.Linear(64, 32)
         self.output = nn.Linear(32, 1)
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
+    
+    def forward(self, input_values):
+
+        x = self.hidden_1(input_values)
+        x = self.relu(x)
+        x = self.hidden_2(x)
+        x = self.relu(x)
+        x = self.output(x)
+        x = self.sigmoid(x)
+
+        return x
+
+class CosinePredictionWihEdge(nn.Module):
+
+    def __init__(self, graph, dim_dict, embed_dim):
+        super().__init__()
+
+        super(CosinePredictionWihEdge, self).__init__()
+        self.dim_dict = dim_dict
+        self.layer_nn = { etype[1]: CosinePredictionWihEdgeLayer(embed_dim,  self.dim_dict["orders"]["edge_dim"]) for etype in graph.canonical_etypes}
 
     def forward(self, graph, h, pos_graph):
         # print("input graph :", graph)
@@ -65,7 +81,7 @@ class CosinePredictionWihEdge(nn.Module):
                 src_nid, dst_nid = graph.all_edges(etype=etype)
                 # emb_heads = F.normalize(h[utype][src_nid], p=2, dim=-1)
                 # emb_tails = F.normalize(h[vtype][dst_nid], p=2, dim=-1)
-                emb_heads = h[utype][src_nid] 
+                emb_heads = h[utype][src_nid]
                 emb_tails = h[vtype][dst_nid]
 
                 # edge_emb = graph.edata['features'][('customer', 'orders', 'product')].shape
@@ -79,15 +95,14 @@ class CosinePredictionWihEdge(nn.Module):
                 cat_embed = torch.cat((emb_heads, emb_tails, edge_emb), 1)
 
                 # print("embedding shape", emb_heads.shape, pos_graph, cat_embed.shape, edge_emb.shape)
-                x = self.hidden_1(cat_embed)
-                x = self.relu(x)
+                # x = self.hidden_1(cat_embed)
+                # x = self.relu(x)
                 # x = self.hidden_2(x)
                 # x = self.relu(x)
-                x = self.output(x)
+                # x = self.output(x)
                 # x = self.sigmoid(x)
                 
-                # print(x.shape)
-                result[etype] = x
+                result[etype] = self.layer_nn[mtype](cat_embed)
 
                 # x = self.hidden_1(cat_embed)
                 # x = self.relu(x)

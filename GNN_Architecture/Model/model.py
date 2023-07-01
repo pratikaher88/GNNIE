@@ -69,7 +69,7 @@ class ConvModel(nn.Module):
         elif pred == 'cos_nn':
             self.pred_fn = Cosine_PredictingModule(dim_dict['out_dim'])
         elif pred == 'exp_cos':
-            self.pred_fn = CosinePredictionWihEdge(dim_dict, dim_dict['out_dim'], dim_dict['orders']['edge_dim'], dim_dict['rev-orders']['edge_dim'])
+            self.pred_fn = CosinePredictionWihEdge(g, dim_dict, dim_dict['out_dim'])
         else:
             print("prediction function has not been specified!")
 
