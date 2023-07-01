@@ -44,7 +44,7 @@ class CosinePredictionWihEdgeLayer(nn.Module):
         x = self.hidden_2(x)
         x = self.relu(x)
         x = self.output(x)
-        x = self.sigmoid(x)
+        # x = self.sigmoid(x)
 
         return x
 
