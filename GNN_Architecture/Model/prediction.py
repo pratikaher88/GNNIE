@@ -39,9 +39,9 @@ class CosinePredictionWihEdgeLayer(nn.Module):
     
     def __init__(self, embed_dim, edge_dim):
         super().__init__()
-        self.hidden_1 = nn.Linear(embed_dim * 2 + edge_dim, 32)
-        self.hidden_2 = nn.Linear(32, 16)
-        self.output = nn.Linear(16, 1)
+        self.hidden_1 = nn.Linear(embed_dim * 2 + edge_dim, 64)
+        self.hidden_2 = nn.Linear(64, 32)
+        self.output = nn.Linear(32, 1)
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
         self.reset_parameters()
