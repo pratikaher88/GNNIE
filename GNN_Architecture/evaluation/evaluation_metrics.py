@@ -47,7 +47,7 @@ def hit_rate_precision(test_recs, recommendations, num_recs):
     if count_none > 0 :
         print("Non-existent users in Precision :", count_none)
     
-    return hits/total
+    return round(hits/total, 7)
 
 def hit_rate_recall(test_recs, recommendations, num_recs):
     
