@@ -63,16 +63,16 @@ class CosinePredictionWihEdge(nn.Module):
 
                 utype, mtype, vtype = etype
                 src_nid, dst_nid = graph.all_edges(etype=etype)
-                emb_heads = F.normalize(h[utype][src_nid], p=2, dim=-1)
-                emb_tails = F.normalize(h[vtype][dst_nid], p=2, dim=-1)
-                # emb_heads = h[utype][src_nid] 
-                # emb_tails = h[vtype][dst_nid]
+                # emb_heads = F.normalize(h[utype][src_nid], p=2, dim=-1)
+                # emb_tails = F.normalize(h[vtype][dst_nid], p=2, dim=-1)
+                emb_heads = h[utype][src_nid] 
+                emb_tails = h[vtype][dst_nid]
 
                 # edge_emb = graph.edata['features'][('customer', 'orders', 'product')].shape
                 # print(h[utype].shape)
 
                 if not pos_graph:
-                    edge_emb = torch.randn(emb_heads.shape[0], self.orders_edge_dim)
+                    edge_emb = torch.randn(emb_heads.shape[0], self.dim_dict[mtype]["edge_dim"])
                 else:
                     edge_emb = edge_features_HM[mtype]
 
