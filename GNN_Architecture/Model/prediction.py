@@ -34,7 +34,7 @@ class CosinePredictionWihEdgeLayer(nn.Module):
         gain_relu = nn.init.calculate_gain('relu')
         gain_sigmoid = nn.init.calculate_gain('sigmoid')
         nn.init.xavier_uniform_(self.hidden_1.weight, gain=gain_relu)
-        nn.init.xavier_uniform_(self.hidden_2.weight, gain=gain_relu)
+        # nn.init.xavier_uniform_(self.hidden_2.weight, gain=gain_relu)
         nn.init.xavier_uniform_(self.output.weight, gain=gain_sigmoid)
     
     def __init__(self, embed_dim, edge_dim):
