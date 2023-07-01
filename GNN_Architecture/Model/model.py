@@ -76,7 +76,6 @@ class ConvModel(nn.Module):
     def get_repr(self,
                  blocks,
                  h):
-                #  edge_features):
 
         # print("Edge features", edge_features['orders'].shape)
         
