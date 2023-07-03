@@ -37,6 +37,8 @@ else:
 
 print("Training Graph: ",ecommerce_hetero_graph_subgraph)
 print("Input nodes shape : ", ecommerce_hetero_graph_subgraph.ndata['features']['customer'].shape, ecommerce_hetero_graph_subgraph.ndata['features']['product'].shape)
+print("Edge dim shape : ", ecommerce_hetero_graph_subgraph.edges['orders'].data['features'].shape, ecommerce_hetero_graph_subgraph.edges['rev-orders'].data['features'].shape)
+
 
 dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['features'].shape[1],
             'product': ecommerce_hetero_graph_subgraph.nodes['product'].data['features'].shape[1],
