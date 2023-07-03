@@ -135,7 +135,7 @@ for e in range(model_config['n_epochs']):
         _, pos_score, neg_score = model(blocks, input_features, edge_features_HM, pos_g, neg_g)
         # _, pos_score, neg_score = model(blocks, input_features, edge_features, pos_g, neg_g)
 
-        loss = binary_cross_entropy_loss(pos_score, neg_score)
+        loss = max_margin_loss(pos_score, neg_score, delta)
 
         total_loss += loss.item()
 
