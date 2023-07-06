@@ -53,6 +53,9 @@ dim_dict = {'customer': ecommerce_hetero_graph_subgraph.nodes['customer'].data['
             'out_dim': model_config['output_dim']
            }
 
+# count of non zero values in the dataset
+# print( torch.count_nonzero(ecommerce_hetero_graph_subgraph.nodes['customer'].data['features']))
+
 # Divide into Train test split
 
 eids = np.arange(ecommerce_hetero_graph_subgraph.number_of_edges(etype='orders'))
@@ -130,8 +133,8 @@ for e in range(model_config['n_epochs']):
         for key, value in edge_features.items():
             edge_features_HM[key[1]] = (value, )
         
-        # print("Edge Features shape : ", edge_features_HM['orders'][0].shape, edge_features_HM['rev-orders'][0].shape)
-        # print("Input Features shape : ", input_features['customer'].shape, input_features['product'].shape)
+        print("Edge Features shape : ", edge_features_HM['orders'][0].shape, edge_features_HM['rev-orders'][0].shape)
+        print("Input Features shape : ", input_features['customer'].shape, input_features['product'].shape)
         # print(len(blocks))
 
         _, pos_score, neg_score = model(blocks, input_features, edge_features_HM, pos_g, neg_g)
